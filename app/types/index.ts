@@ -24,4 +24,7 @@ export type Submission = {
   deathScene?: string;
   rationale?: string;
   timestamp?: string;
+  // Development mode indicators
+  isDevelopmentMode?: boolean;
+  mockData?: boolean;
 }; 

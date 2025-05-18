@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { evaluateSurvival } from "@/app/utils/openai";
 import type { Submission } from "@/app/types";
 import { Locale } from "@/app/i18n";
+import { DEV_CONFIG } from "@/app/constants/development";
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +37,15 @@ export async function POST(request: Request) {
       rationale: result.rationale,
       timestamp: new Date().toISOString(),
     };
+
+    // Add development mode indicator when using mock data
+    if (DEV_CONFIG.DEV_MODE && DEV_CONFIG.USE_MOCK_RESPONSES) {
+      return NextResponse.json({
+        ...evaluation,
+        isDevelopmentMode: true,
+        mockData: true,
+      });
+    }
 
     return NextResponse.json(evaluation);
   } catch (error) {

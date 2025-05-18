@@ -1,7 +1,10 @@
 import OpenAI from "openai";
 import { Locale } from "../i18n";
+import { DEV_CONFIG } from "../constants/development";
+import { mockEvaluationResponses, delay } from "./mockData";
+import { apiCache } from "./cache";
 
-if (!process.env.OPENAI_API_KEY) {
+if (!process.env.OPENAI_API_KEY && !DEV_CONFIG.USE_MOCK_RESPONSES) {
   throw new Error("Missing OPENAI_API_KEY environment variable");
 }
 
@@ -22,6 +25,37 @@ export async function evaluateSurvival(
   locale: Locale = 'en'
 ): Promise<EvaluationResponse> {
   try {
+    // Create a cache key for this evaluation
+    const cacheKey = apiCache.createEvaluationKey(scenario, answers, locale);
+    
+    // Check if we have a cached response and should use cache
+    if (DEV_CONFIG.CACHE_API_RESPONSES && apiCache.has(cacheKey)) {
+      console.log("[DEV] Using cached response for evaluation");
+      const cachedResponse = apiCache.get<EvaluationResponse>(cacheKey);
+      if (cachedResponse) return cachedResponse;
+    }
+    
+    // Use mock responses in development mode
+    if (DEV_CONFIG.USE_MOCK_RESPONSES) {
+      console.log("[DEV] Using mock response for scenario:", scenario);
+      
+      // Simulate API delay if configured
+      if (DEV_CONFIG.MOCK_RESPONSE_DELAY > 0) {
+        await delay(DEV_CONFIG.MOCK_RESPONSE_DELAY);
+      }
+      
+      // Get mock response for this scenario and locale, or fallback to error response
+      const mockResponse = mockEvaluationResponses[scenario]?.[locale] || getErrorResponse(locale);
+      
+      // Cache the mock response if caching is enabled
+      if (DEV_CONFIG.CACHE_API_RESPONSES) {
+        apiCache.set(cacheKey, mockResponse);
+      }
+      
+      return mockResponse;
+    }
+    
+    // For production, use the real OpenAI API
     // Get language-specific instructions
     const instructions = getInstructions(locale);
     
@@ -58,8 +92,15 @@ ${instructions.formatInstructions}`;
         typeof result.deathScene === 'string' &&
         typeof result.rationale === 'string'
       ) {
-        // Ensure score is always 0 regardless of the API response
-        return { ...result, score: 0 };
+        // Original code always set score to 0, but we should use the value from the API
+        const evaluationResult = { ...result, score: result.score || 0 };
+        
+        // Cache the API response if caching is enabled
+        if (DEV_CONFIG.CACHE_API_RESPONSES) {
+          apiCache.set(cacheKey, evaluationResult);
+        }
+        
+        return evaluationResult;
       }
       throw new Error("Invalid response format");
     } catch (parseError) {
