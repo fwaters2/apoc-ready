@@ -65,6 +65,27 @@ export default function Home() {
     setError(null);
   };
 
+  // Format text with special handling for ALL CAPS and exclamation marks
+  const formatText = (text: string = "") => {
+    // Split by newlines first
+    return text.split('\n').map((paragraph, pIndex) => {
+      // Further process each paragraph for emphasis
+      const processedText = paragraph
+        // Add emphasis to ALL CAPS phrases
+        .replace(/\b([A-Z]{2,})\b/g, '<span class="text-red-400 font-bold">$1</span>')
+        // Add emphasis to exclamation marks
+        .replace(/(!{1,})/g, '<span class="text-red-400 font-bold">$1</span>');
+      
+      return (
+        <p 
+          key={pIndex} 
+          className="mb-4"
+          dangerouslySetInnerHTML={{ __html: processedText }}
+        />
+      );
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
       <h1 className="text-4xl font-bold text-center mb-8 font-mono text-green-400">
@@ -72,21 +93,42 @@ export default function Home() {
       </h1>
       
       {result ? (
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="bg-gray-800 p-8 rounded-lg border border-gray-700 mb-8">
             <h2 className="text-2xl font-mono text-green-400 mb-4">EVALUATION COMPLETE</h2>
-            <div className="mb-4">
-              <span className="text-6xl font-bold font-mono text-green-400">
+            <div className="flex items-center mb-6">
+              <div className="text-6xl font-bold font-mono text-red-500 mr-4 border-r border-gray-600 pr-4">
                 {result.score}%
-              </span>
-              <span className="text-gray-400 ml-2">Survival Rate</span>
+              </div>
+              <div className="text-gray-400">
+                <div className="text-xl mb-1">Survival Rate</div>
+                <div className="text-sm font-mono text-red-400 italic">&ldquo;{result.rationale}&rdquo;</div>
+              </div>
             </div>
-            <p className="text-xl font-mono text-gray-300 mb-6">{result.feedback}</p>
+            
+            {result.analysis && (
+              <div className="border-t border-gray-700 pt-6 mb-6">
+                <h3 className="text-xl font-mono text-red-400 mb-4">WHAT WERE YOU THINKING?!</h3>
+                <div className="text-gray-300 leading-relaxed font-mono text-sm bg-gray-900/30 p-5 rounded border-l-4 border-red-900">
+                  {formatText(result.analysis)}
+                </div>
+              </div>
+            )}
+            
+            {result.deathScene && (
+              <div className="border-t border-gray-700 pt-6 mb-6">
+                <h3 className="text-xl font-mono text-red-400 mb-4">YOUR INEVITABLE END:</h3>
+                <div className="text-gray-300 leading-relaxed font-mono text-sm italic bg-gray-900/50 p-5 rounded border-l-4 border-red-900">
+                  {formatText(result.deathScene)}
+                </div>
+              </div>
+            )}
+            
             <button
-              className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg font-mono transition-colors"
+              className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg font-mono transition-colors mt-6"
               onClick={handleReset}
             >
-              TRY ANOTHER SCENARIO
+              TRY AGAIN, FOR THE LOVE OF GOD
             </button>
           </div>
         </div>
@@ -135,7 +177,7 @@ export default function Home() {
                 onClick={handleSubmit}
                 disabled={loading || answers.length !== selectedScenario.questions.length}
               >
-                {loading ? "EVALUATING..." : "EVALUATE SURVIVAL CHANCES"}
+                {loading ? "EVALUATING..." : "EVALUATE MY CHANCES (IF YOU DARE)"}
               </button>
 
               {error && (

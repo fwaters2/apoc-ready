@@ -15,12 +15,20 @@ export const APOCALYPSE_SCENARIOS: ApocalypseScenario[] = [
       "What special skill do you bring to a survivor group?",
       "How would you handle encountering an infected loved one?",
     ],
-    promptTemplate: `Given the following zombie apocalypse scenario and user answers, evaluate their likelihood of survival. Be brutally honest but humorous.
+    promptTemplate: `Given the following zombie apocalypse scenario and user answers, evaluate their likelihood of survival. Channel comedian Bill Burr's style throughout ALL sections - use his direct, cynical, exasperated rants about the absurdity of people's choices, with ALL CAPS for emphasis and lots of rhetorical questions.
 Scenario: Zombie Outbreak
 Answers:
 {{answers}}
 
-Respond with a survival score (0-100) and a brief, sarcastic comment about their chances.`,
+Provide a structured evaluation with ALL sections in Bill Burr's comedic voice:
+
+1. ANALYSIS: Express exasperated disbelief at their choices, use rhetorical questions, and build up a rant about how each choice is worse than the last. Use Bill Burr's signature phrases and comedic timing.
+
+2. DEATH_SCENE: Write this EXACTLY like Bill Burr would describe it in a stand-up routine - with his characteristic rants, interrupting himself, using ALL CAPS for emphasis, and expressing complete disbelief at the user's stupidity. Make it a comedic, absurd scene showing the inevitable consequences of their terrible choices.
+
+3. SCORE_AND_RATIONALE: Write a one-sentence rationale in pure Bill Burr style - cynical, blunt, with his signature exasperated tone. Make it sound like something he would yell during a podcast rant.
+
+Respond with properly formatted JSON containing these sections.`,
   },
   {
     id: "alien",
@@ -36,11 +44,19 @@ Respond with a survival score (0-100) and a brief, sarcastic comment about their
       "How would you convince them humans are worth keeping around?",
       "What's your backup plan if negotiation fails?",
     ],
-    promptTemplate: `Given the following alien invasion scenario and user answers, evaluate their likelihood of survival. Be brutally honest but humorous.
+    promptTemplate: `Given the following alien invasion scenario and user answers, evaluate their likelihood of survival. Channel comedian Bill Burr's style throughout ALL sections - use his direct, cynical, exasperated rants about the absurdity of people's choices, with ALL CAPS for emphasis and lots of rhetorical questions.
 Scenario: Alien Invasion
 Answers:
 {{answers}}
 
-Respond with a survival score (0-100) and a brief, sarcastic comment about their chances.`,
+Provide a structured evaluation with ALL sections in Bill Burr's comedic voice:
+
+1. ANALYSIS: Express exasperated disbelief at their choices, use rhetorical questions, and build up a rant about how each choice is worse than the last. Use Bill Burr's signature phrases and comedic timing.
+
+2. DEATH_SCENE: Write this EXACTLY like Bill Burr would describe it in a stand-up routine - with his characteristic rants, interrupting himself, using ALL CAPS for emphasis, and expressing complete disbelief at the user's stupidity. Make it a comedic, absurd scene showing the inevitable consequences of their terrible choices.
+
+3. SCORE_AND_RATIONALE: Write a one-sentence rationale in pure Bill Burr style - cynical, blunt, with his signature exasperated tone. Make it sound like something he would yell during a podcast rant.
+
+Respond with properly formatted JSON containing these sections.`,
   },
 ]; 

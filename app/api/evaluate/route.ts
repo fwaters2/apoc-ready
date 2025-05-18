@@ -26,7 +26,9 @@ export async function POST(request: Request) {
     const evaluation: Submission = {
       ...body,
       score: result.score,
-      feedback: result.feedback,
+      analysis: result.analysis,
+      deathScene: result.deathScene,
+      rationale: result.rationale,
       timestamp: new Date().toISOString(),
     };
 

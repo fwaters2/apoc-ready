@@ -20,5 +20,8 @@ export type Submission = {
   name: string;
   score?: number;
   feedback?: string;
+  analysis?: string;
+  deathScene?: string;
+  rationale?: string;
   timestamp?: string;
 }; 

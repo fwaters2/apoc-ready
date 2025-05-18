@@ -87,7 +87,7 @@ type Submission = {
 \```txt
 Given the following apocalypse scenario and user answers, evaluate their likelihood of survival. Respond with:
 1. A survival score from 0–100.
-2. A brief comment explaining the reasoning in a sarcastic or dramatic tone.
+2. A demoralizing description of how their answers lead to their inevitable demise.
 
 Scenario: Zombie Outbreak  
 Answers:
@@ -98,7 +98,9 @@ Answers:
 
 - Normally return score = 0–5%
 - Rarely allow 10–50% if responses are clever/funny
-- Ensure response includes both score and commentary
+- Ensure response includes both score and a detailed, demoralizing description of their fate
+- Focus on explaining specifically how each answer contributes to their doom in a comedic but grim way
+- Include a short paragraph describing their inevitable demise (comedic, not graphic)
 
 ---
 
