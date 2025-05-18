@@ -6,6 +6,7 @@
   --container-padding-mobile: 2rem;
   --container-padding-desktop: 4rem;
   --container-max-width: 1200px;
+  --header-height: 3.5rem;
   
   /* Theme specific variables */
   --zombie-primary: #aa2222;
