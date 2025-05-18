@@ -226,10 +226,10 @@ ${instructions.formatInstructions}`;
         typeof result.deathScene === 'string' &&
         typeof result.rationale === 'string'
       ) {
-        // Ensure score has a default value of 0 if not present
+        // Always set score to 0 regardless of what was returned
         const evaluationResult = { 
           ...result, 
-          score: typeof result.score === 'number' ? result.score : 0 
+          score: 0 
         };
         
         // Cache the API response if caching is enabled
