@@ -1,17 +1,32 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { APOCALYPSE_SCENARIOS } from "./constants/scenarios";
 import type { Answer, ApocalypseScenario, Submission } from "./types";
 import { Locale, locales, getTranslation, scenarioTranslations } from "./i18n";
 
+// Add translations for high scores link
+const highScoresTranslations = {
+  'en': {
+    viewHighScores: 'VIEW HALL OF FAME',
+    evaluationComplete: 'EVALUATION COMPLETE',
+  },
+  'zh-TW': {
+    viewHighScores: '查看名人堂',
+    evaluationComplete: '評估完成',
+  }
+};
+
 export default function Home() {
+  const router = useRouter();
   const [selectedScenario, setSelectedScenario] = useState<ApocalypseScenario | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [result, setResult] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [locale, setLocale] = useState<Locale>('en');
+  const [username, setUsername] = useState<string>("Anonymous");
 
   const getTranslatedQuestion = (scenario: ApocalypseScenario, index: number) => {
     const translation = scenarioTranslations[scenario.id]?.[locale];
@@ -51,7 +66,7 @@ export default function Home() {
         body: JSON.stringify({
           scenarioId: selectedScenario.id,
           answers,
-          name: "Anonymous", // You could add a name input field later
+          name: username, // Use the entered username
           locale, // Add the current locale
         }),
       });
@@ -74,6 +89,16 @@ export default function Home() {
     setAnswers([]);
     setResult(null);
     setError(null);
+  };
+
+  const handleViewHighScores = () => {
+    if (result) {
+      // Navigate to high scores with the user's result as URL parameters
+      router.push(`/highscores?name=${encodeURIComponent(result.name)}&scenarioId=${encodeURIComponent(result.scenarioId)}&score=${encodeURIComponent(result.score || 0)}&timestamp=${encodeURIComponent(result.timestamp || '')}`);
+    } else {
+      // Navigate to high scores without parameters
+      router.push('/highscores');
+    }
   };
 
   // Format text with special handling for ALL CAPS and exclamation marks
@@ -121,7 +146,9 @@ export default function Home() {
       {result ? (
         <div className="max-w-3xl mx-auto">
           <div className="bg-gray-800 p-8 rounded-lg border border-gray-700 mb-8">
-            <h2 className="text-2xl font-mono text-green-400 mb-4">EVALUATION COMPLETE</h2>
+            <h2 className="text-2xl font-mono text-green-400 mb-4">
+              {highScoresTranslations[locale].evaluationComplete}
+            </h2>
             <div className="flex items-center mb-6">
               <div className="text-6xl font-bold font-mono text-red-500 mr-4 border-r border-gray-600 pr-4">
                 {result.score}%
@@ -154,12 +181,22 @@ export default function Home() {
               </div>
             )}
             
-            <button
-              className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg font-mono transition-colors mt-6"
-              onClick={handleReset}
-            >
-              {getTranslation(locale, 'tryAgainButton')}
-            </button>
+            {/* Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <button
+                className="py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg font-mono transition-colors"
+                onClick={handleReset}
+              >
+                {getTranslation(locale, 'tryAgainButton')}
+              </button>
+              
+              <button
+                className="py-4 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg font-mono transition-colors"
+                onClick={handleViewHighScores}
+              >
+                {highScoresTranslations[locale].viewHighScores}
+              </button>
+            </div>
           </div>
         </div>
       ) : (
@@ -186,6 +223,19 @@ export default function Home() {
               })}
             </select>
           </div>
+
+          {/* Username Input */}
+          {selectedScenario && (
+            <div className="mb-6">
+              <input
+                type="text"
+                className="w-full bg-gray-800 text-gray-100 p-3 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500 font-mono"
+                placeholder="Enter your username..."
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+          )}
 
           {/* Questions */}
           {selectedScenario && (
@@ -218,6 +268,16 @@ export default function Home() {
                   {error}
                 </div>
               )}
+
+              {/* Link to high scores */}
+              <div className="mt-8 text-center">
+                <button
+                  className="text-gray-400 hover:text-green-400 font-mono transition-colors text-sm underline"
+                  onClick={() => router.push('/highscores')}
+                >
+                  {highScoresTranslations[locale].viewHighScores}
+                </button>
+              </div>
             </div>
           )}
         </>
