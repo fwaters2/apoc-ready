@@ -6,6 +6,26 @@
   --container-padding-mobile: 2rem;
   --container-padding-desktop: 4rem;
   --container-max-width: 1200px;
+  
+  /* Theme specific variables */
+  --zombie-primary: #aa2222;
+  --zombie-secondary: #ff4444;
+  --zombie-accent: #990000;
+  --zombie-text: #ffcccc;
+  --zombie-highlight: #dd3333;
+  
+  --alien-primary: #22aa44;
+  --alien-secondary: #44ff66;
+  --alien-accent: #009922;
+  --alien-text: #ccffdd;
+  --alien-highlight: #33dd55;
+  
+  /* Default theme (can be either zombie or alien) */
+  --theme-primary: var(--zombie-primary);
+  --theme-secondary: var(--zombie-secondary);
+  --theme-accent: var(--zombie-accent);
+  --theme-text: var(--zombie-text);
+  --theme-highlight: var(--zombie-highlight);
 }
 
 @theme inline {
@@ -57,6 +77,23 @@ body {
   position: relative;
   z-index: 1;
   min-height: 100vh;
+}
+
+/* Theme classes */
+.theme-zombie {
+  --theme-primary: var(--zombie-primary);
+  --theme-secondary: var(--zombie-secondary);
+  --theme-accent: var(--zombie-accent);
+  --theme-text: var(--zombie-text);
+  --theme-highlight: var(--zombie-highlight);
+}
+
+.theme-alien {
+  --theme-primary: var(--alien-primary);
+  --theme-secondary: var(--alien-secondary);
+  --theme-accent: var(--alien-accent);
+  --theme-text: var(--alien-text);
+  --theme-highlight: var(--alien-highlight);
 }
 
 /* Desktop breakpoints */

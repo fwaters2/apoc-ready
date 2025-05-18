@@ -124,8 +124,8 @@ export default function Home() {
   const formatText = (text: string = "") => {
     return text.split('\n').map((paragraph, pIndex) => {
       const processedText = paragraph
-        .replace(/\b([A-Z]{2,})\b/g, '<span class="text-red-400 font-bold">$1</span>')
-        .replace(/(!{1,})/g, '<span class="text-red-400 font-bold">$1</span>');
+        .replace(/\b([A-Z]{2,})\b/g, `<span style="color: var(--theme-secondary); font-weight: bold;">$1</span>`)
+        .replace(/(!{1,})/g, `<span style="color: var(--theme-secondary); font-weight: bold;">$1</span>`);
       
       return (
         <p 
@@ -140,7 +140,7 @@ export default function Home() {
 
   return (
     <div 
-      className="bg-fixed min-h-screen" 
+      className={`bg-fixed min-h-screen ${selectedScenario ? `theme-${selectedScenario.id}` : ''}`} 
       style={{
         backgroundColor: '#111827', // bg-gray-900
         backgroundImage: selectedScenario && imageLoaded ? `url(${selectedScenario.theme.image})` : 'none',
@@ -167,32 +167,32 @@ export default function Home() {
           </select>
         </div>
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 md:mb-12 font-mono text-green-400">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 md:mb-12 font-mono" style={{ color: 'var(--theme-highlight)' }}>
           {getTranslation(locale, 'appTitle')}
         </h1>
         
         {result ? (
           <div className="max-w-3xl mx-auto lg:max-w-4xl">
             <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700 mb-8">
-              <h2 className="text-2xl md:text-3xl font-mono text-green-400 mb-4">
+              <h2 className="text-2xl md:text-3xl font-mono mb-4" style={{ color: 'var(--theme-highlight)' }}>
                 {highScoresTranslations[locale].evaluationComplete}
               </h2>
               <div className="flex flex-col md:flex-row items-center mb-6">
-                <div className="text-6xl font-bold font-mono text-red-500 mr-4 md:border-r border-gray-600 md:pr-4 mb-4 md:mb-0">
+                <div className="text-6xl font-bold font-mono mr-4 md:border-r border-gray-600 md:pr-4 mb-4 md:mb-0" style={{ color: 'var(--theme-primary)' }}>
                   {result.score}%
                 </div>
                 <div className="text-gray-400">
                   <div className="text-xl mb-1">{getTranslation(locale, 'survivalRate')}</div>
-                  <div className="text-sm font-mono text-red-400 italic">&ldquo;{result.rationale}&rdquo;</div>
+                  <div className="text-sm font-mono italic" style={{ color: 'var(--theme-secondary)' }}>&ldquo;{result.rationale}&rdquo;</div>
                 </div>
               </div>
               
               {result.analysis && (
                 <div className="border-t border-gray-700 pt-6 mb-6">
-                  <h3 className="text-xl font-mono text-red-400 mb-4">
+                  <h3 className="text-xl font-mono mb-4" style={{ color: 'var(--theme-secondary)' }}>
                     {getTranslation(locale, 'analysisTitle')}
                   </h3>
-                  <div className="text-gray-300 leading-relaxed font-mono text-sm bg-gray-900/30 p-5 rounded border-l-4 border-red-900">
+                  <div className="text-gray-300 leading-relaxed font-mono text-sm bg-gray-900/30 p-5 rounded border-l-4" style={{ borderLeftColor: 'var(--theme-accent)' }}>
                     {formatText(result.analysis)}
                   </div>
                 </div>
@@ -200,10 +200,10 @@ export default function Home() {
               
               {result.deathScene && (
                 <div className="border-t border-gray-700 pt-6 mb-6">
-                  <h3 className="text-xl font-mono text-red-400 mb-4">
+                  <h3 className="text-xl font-mono mb-4" style={{ color: 'var(--theme-secondary)' }}>
                     {getTranslation(locale, 'deathSceneTitle')}
                   </h3>
-                  <div className="text-gray-300 leading-relaxed font-mono text-sm italic bg-gray-900/50 p-5 rounded border-l-4 border-red-900">
+                  <div className="text-gray-300 leading-relaxed font-mono text-sm italic bg-gray-900/50 p-5 rounded border-l-4" style={{ borderLeftColor: 'var(--theme-accent)' }}>
                     {formatText(result.deathScene)}
                   </div>
                 </div>
@@ -212,14 +212,20 @@ export default function Home() {
               {/* Buttons */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <button
-                  className="py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg font-mono transition-colors"
+                  className="py-4 text-white font-bold rounded-lg font-mono transition-colors hover:opacity-90"
+                  style={{ 
+                    backgroundColor: 'var(--theme-accent)'
+                  }}
                   onClick={handleReset}
                 >
                   {getTranslation(locale, 'tryAgainButton')}
                 </button>
                 
                 <button
-                  className="py-4 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg font-mono transition-colors"
+                  className="py-4 text-white font-bold rounded-lg font-mono transition-colors hover:opacity-90"
+                  style={{ 
+                    backgroundColor: 'var(--theme-secondary)'
+                  }}
                   onClick={handleViewHighScores}
                 >
                   {highScoresTranslations[locale].viewHighScores}
@@ -232,7 +238,7 @@ export default function Home() {
             {/* Scenario Selection */}
             <div className="max-w-3xl mx-auto lg:max-w-5xl">
               <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700 mb-8">
-                <h2 className="text-2xl md:text-3xl font-mono text-green-400 mb-6">
+                <h2 className="text-2xl md:text-3xl font-mono mb-6" style={{ color: 'var(--theme-highlight)' }}>
                   {getTranslation(locale, 'selectScenario')}
                 </h2>
                 
@@ -243,7 +249,9 @@ export default function Home() {
                       className="border border-gray-700 bg-gray-900 bg-opacity-70 rounded-lg p-4 md:p-6 mb-4 md:mb-0 cursor-pointer transition-all hover:bg-gray-700 hover:border-gray-500"
                       onClick={() => setSelectedScenario(scenario)}
                     >
-                      <h3 className="text-xl md:text-2xl font-mono text-red-400 mb-2">
+                      <h3 className="text-xl md:text-2xl font-mono mb-2" style={{ 
+                        color: scenario.id === 'zombie' ? 'var(--zombie-secondary)' : 'var(--alien-secondary)' 
+                      }}>
                         {scenarioTranslations[scenario.id]?.[locale]?.name || scenario.name}
                       </h3>
                       <p className="text-gray-300 mb-2">
@@ -263,12 +271,13 @@ export default function Home() {
               <div className="max-w-3xl mx-auto lg:max-w-4xl">
                 <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700">
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl md:text-2xl font-mono text-green-400">
+                    <h2 className="text-xl md:text-2xl font-mono" style={{ color: 'var(--theme-highlight)' }}>
                       {scenarioTranslations[selectedScenario.id]?.[locale]?.name || selectedScenario.name}
                     </h2>
                     <button
                       onClick={handleReset}
-                      className="bg-gray-700 text-gray-200 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-gray-600 transition-colors text-sm"
+                      className="text-gray-200 px-3 py-1 md:px-4 md:py-2 rounded transition-colors text-sm hover:opacity-90"
+                      style={{ backgroundColor: 'var(--theme-accent)' }}
                     >
                       {getTranslation(locale, 'evaluateButton')}
                     </button>
@@ -278,7 +287,10 @@ export default function Home() {
                   <div className="mb-6">
                     <input
                       type="text"
-                      className="w-full bg-gray-800 bg-opacity-90 text-gray-100 p-3 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500 font-mono"
+                      className="w-full bg-gray-800 bg-opacity-90 text-gray-100 p-3 rounded-lg border border-gray-700 font-mono focus:outline-none"
+                      style={{ 
+                        borderColor: 'var(--theme-accent)',
+                      }}
                       placeholder="Enter your username..."
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
@@ -288,11 +300,12 @@ export default function Home() {
                   <div className="space-y-6">
                     {selectedScenario.questions.map((question, index) => (
                       <div key={index} className="bg-gray-800 bg-opacity-90 p-6 rounded-lg border border-gray-700">
-                        <label className="block mb-3 font-mono text-green-400">
+                        <label className="block mb-3 font-mono" style={{ color: 'var(--theme-secondary)' }}>
                           {`[${index + 1}] ${getTranslatedQuestion(selectedScenario, index)}`}
                         </label>
                         <textarea
-                          className="w-full bg-gray-900 text-gray-100 p-3 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                          className="w-full bg-gray-900 text-gray-100 p-3 rounded-lg border focus:outline-none"
+                          style={{ borderColor: 'var(--theme-accent)' }}
                           rows={3}
                           value={answers.find(a => a.questionIndex === index)?.text || ""}
                           onChange={(e) => handleAnswerChange(index, e.target.value)}
@@ -305,17 +318,29 @@ export default function Home() {
                       <button
                         onClick={handleSubmit}
                         disabled={loading || answers.length < selectedScenario.questions.length}
-                        className={`px-6 py-3 rounded-md font-mono text-lg ${
+                        className={`px-6 py-3 rounded-md font-mono text-lg transition-colors ${
                           loading || answers.length < selectedScenario.questions.length
-                            ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                            : "bg-green-700 text-white hover:bg-green-600 transition-colors"
+                            ? "text-gray-400 cursor-not-allowed"
+                            : "text-white hover:opacity-90"
                         }`}
+                        style={{ 
+                          backgroundColor: loading || answers.length < selectedScenario.questions.length 
+                            ? "#4B5563" // gray-600
+                            : "var(--theme-secondary)"
+                        }}
                       >
                         {loading ? getTranslation(locale, 'evaluatingButton') : getTranslation(locale, 'evaluateButton')}
                       </button>
 
                       {error && (
-                        <div className="mt-4 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-400 font-mono">
+                        <div 
+                          className="mt-4 p-4 bg-opacity-50 border rounded-lg font-mono"
+                          style={{ 
+                            backgroundColor: 'var(--theme-primary)', 
+                            borderColor: 'var(--theme-accent)',
+                            color: 'var(--theme-text)'
+                          }}
+                        >
                           {error}
                         </div>
                       )}
