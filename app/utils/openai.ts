@@ -158,7 +158,7 @@ ${instructions.formatInstructions}`;
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "chatgpt-4o-latest",
       messages: [
         {
           role: "system",
@@ -170,7 +170,7 @@ ${instructions.formatInstructions}`;
         },
       ],
       temperature: 0.8,
-      response_format: { type: "json_object" }, // Request JSON directly from the API
+      response_format: { type: "json_object" },
     });
 
     // Get the raw response content
