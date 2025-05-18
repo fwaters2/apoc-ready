@@ -5,7 +5,7 @@ export const APOCALYPSE_SCENARIOS: ApocalypseScenario[] = [
     id: "zombie",
     name: "Zombie Outbreak",
     theme: {
-      image: "/backgrounds/zombie.jpg",
+      image: "/backgrounds/zombie.png",
       colorPalette: ["#2D3436", "#636E72", "#B2BEC3", "#DFE6E9"],
     },
     questions: [
@@ -34,7 +34,7 @@ Respond with properly formatted JSON containing these sections.`,
     id: "alien",
     name: "Alien Invasion",
     theme: {
-      image: "/backgrounds/alien.jpg",
+      image: "/backgrounds/alien.png",
       colorPalette: ["#004D40", "#00897B", "#4DB6AC", "#B2DFDB"],
     },
     questions: [
