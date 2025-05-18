@@ -4,21 +4,22 @@ import { DEV_CONFIG } from "../constants/development";
 import { mockEvaluationResponses, delay } from "./mockData";
 import { apiCache } from "./cache";
 
-// Allow development without API key if USE_MOCK_RESPONSES is enabled
-if (!process.env.OPENAI_API_KEY) {
-  if (DEV_CONFIG.USE_MOCK_RESPONSES) {
-    console.warn("⚠️ No OPENAI_API_KEY found. Using mock responses for development.");
+// Get API key from environment variables - check both regular and NEXT_PUBLIC_ variants
+const API_KEY = process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+
+// Production safety check - fall back to mock responses rather than breaking the app
+if (!API_KEY) {
+  if (DEV_CONFIG.USE_MOCK_RESPONSES || process.env.NODE_ENV !== "production") {
+    console.warn("⚠️ No OpenAI API key found. Using mock responses instead.");
   } else {
-    throw new Error(
-      "Missing OPENAI_API_KEY environment variable. Either add this to your .env.local file or enable USE_MOCK_RESPONSES in constants/development.js"
-    );
+    // In production with no API key - force mock responses to prevent breaking the app
+    console.error("⚠️ WARNING: No OpenAI API key found in production. Forcing mock responses.");
+    Object.assign(DEV_CONFIG, { USE_MOCK_RESPONSES: true });
   }
 }
 
-// Create OpenAI instance only if we have an API key or if we're in mock mode
-const openai = process.env.OPENAI_API_KEY 
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null; // Will use mock responses instead
+// Create OpenAI instance only if we have an API key
+const openai = API_KEY ? new OpenAI({ apiKey: API_KEY }) : null;
 
 export type EvaluationResponse = {
   score: number;
