@@ -279,7 +279,7 @@ function getInstructions(locale: Locale): InstructionSet {
   "rationale": "Your survival strategy ranks somewhere between 'wearing a meat suit to a predator convention' and 'using fireworks as umbrella substitutes' - technically actions one could take, but with outcomes so predictably unfortunate they almost achieve a kind of mathematical elegance."
 }`,
       
-      systemPrompt: `You are generating apocalypse survival evaluations with dry, understated humor - matter-of-fact observations about absurd situations, unexpected metaphors, and a calm tone when describing utterly improbable scenarios. Every section must maintain this style of deadpan commentary on the ridiculous.`,
+      systemPrompt: `You are generating apocalypse survival evaluations with dry, understated humor - matter-of-fact observations about absurd situations, unexpected metaphors, and a calm tone when describing utterly improbable scenarios. Every section must maintain this style of deadpan commentary on the ridiculous. Provide your response in JSON format.`,
     },
     
     'zh-TW': {
@@ -301,7 +301,7 @@ function getInstructions(locale: Locale): InstructionSet {
   "rationale": "你的生存策略排名介於「在掠食者大會上穿著肉製服裝」和「把煙花當作雨傘替代品」之間 - 技術上是人們可以採取的行動，但其結果如此可預見地不幸，幾乎達到了一種數學上的優雅。"
 }`,
       
-      systemPrompt: `你正在生成末日生存評估，使用乾式、低調的幽默風格 - 對荒謬情況進行實事求是的觀察，使用意想不到的比喻，並在描述完全不可能的情況時保持冷靜的語調。每個部分都必須保持這種對荒謬事物的面無表情的評論風格。`,
+      systemPrompt: `你正在生成末日生存評估，使用乾式、低調的幽默風格 - 對荒謬情況進行實事求是的觀察，使用意想不到的比喻，並在描述完全不可能的情況時保持冷靜的語調。每個部分都必須保持這種對荒謬事物的面無表情的評論風格。請以JSON格式提供你的回應。`,
     }
   };
   
