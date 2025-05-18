@@ -6,6 +6,7 @@ import { APOCALYPSE_SCENARIOS } from "./constants/scenarios";
 import type { Answer, ApocalypseScenario, Submission } from "./types";
 import { Locale, getTranslation, scenarioTranslations } from "./i18n";
 import Header from "./components/Header";
+import { getLoadingMessage } from "./utils/openai";
 
 // Add translations for high scores link
 const highScoresTranslations = {
@@ -29,6 +30,7 @@ export default function Home() {
   const [locale, setLocale] = useState<Locale>('en');
   const [username, setUsername] = useState<string>("Anonymous");
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
 
   // Load locale from localStorage on component mount
   useEffect(() => {
@@ -91,6 +93,14 @@ export default function Home() {
     setLoading(true);
     setError(null);
     
+    // Set initial loading message
+    setLoadingMessage(getLoadingMessage(locale));
+    
+    // Change loading message every 3 seconds
+    const loadingInterval = setInterval(() => {
+      setLoadingMessage(getLoadingMessage(locale));
+    }, 3000);
+    
     try {
       const response = await fetch("/api/evaluate", {
         method: "POST",
@@ -115,6 +125,7 @@ export default function Home() {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
+      clearInterval(loadingInterval);
     }
   };
 
@@ -312,7 +323,7 @@ export default function Home() {
                         </div>
                       ))}
 
-                      <div className="flex flex-col md:flex-row gap-4 justify-center mt-8">
+                      <div className="flex flex-col gap-4 justify-center mt-8">
                         <button
                           onClick={handleSubmit}
                           disabled={loading || answers.length < selectedScenario.questions.length}
@@ -330,9 +341,20 @@ export default function Home() {
                           {loading ? getTranslation(locale, 'evaluatingButton') : getTranslation(locale, 'evaluateButton')}
                         </button>
 
+                        {loading && (
+                          <div className="p-4 bg-opacity-50 bg-gray-900 border rounded-lg font-mono animate-pulse text-center"
+                            style={{ 
+                              borderColor: 'var(--theme-accent)',
+                              color: 'var(--theme-highlight)'
+                            }}
+                          >
+                            {loadingMessage}
+                          </div>
+                        )}
+
                         {error && (
                           <div 
-                            className="mt-4 p-4 bg-opacity-50 border rounded-lg font-mono"
+                            className="p-4 bg-opacity-50 border rounded-lg font-mono"
                             style={{ 
                               backgroundColor: 'var(--theme-primary)', 
                               borderColor: 'var(--theme-accent)',

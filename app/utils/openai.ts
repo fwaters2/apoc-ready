@@ -4,13 +4,21 @@ import { DEV_CONFIG } from "../constants/development";
 import { mockEvaluationResponses, delay } from "./mockData";
 import { apiCache } from "./cache";
 
-if (!process.env.OPENAI_API_KEY && !DEV_CONFIG.USE_MOCK_RESPONSES) {
-  throw new Error("Missing OPENAI_API_KEY environment variable");
+// Allow development without API key if USE_MOCK_RESPONSES is enabled
+if (!process.env.OPENAI_API_KEY) {
+  if (DEV_CONFIG.USE_MOCK_RESPONSES) {
+    console.warn("⚠️ No OPENAI_API_KEY found. Using mock responses for development.");
+  } else {
+    throw new Error(
+      "Missing OPENAI_API_KEY environment variable. Either add this to your .env.local file or enable USE_MOCK_RESPONSES in constants/development.js"
+    );
+  }
 }
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Create OpenAI instance only if we have an API key or if we're in mock mode
+const openai = process.env.OPENAI_API_KEY 
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null; // Will use mock responses instead
 
 export type EvaluationResponse = {
   score: number;
@@ -18,6 +26,50 @@ export type EvaluationResponse = {
   deathScene: string;
   rationale: string;
 };
+
+/**
+ * Provides humorous loading messages for the apocalypse evaluation process.
+ * @param locale The current locale
+ * @returns A random loading message
+ */
+export function getLoadingMessage(locale: Locale = 'en'): string {
+  const messages: Record<Locale, string[]> = {
+    'en': [
+      "Calculating your survival probability to 17 decimal places...",
+      "Consulting with cockroaches about post-apocalyptic real estate...",
+      "Simulating 7,342 apocalypse scenarios with you as the protagonist...",
+      "Measuring your survival instincts against a particularly clever house plant...",
+      "Comparing your choices to those of fictional characters who died in chapter one...",
+      "Polling zombies about your tastiness quotient...",
+      "Running your survival strategy through our \"Definitely Doomed\" algorithm...",
+      "Consulting ancient prophecies about your specific demise...",
+      "Determining exactly how many seconds you'd last in a proper apocalypse...",
+      "Cross-referencing your choices with \"Common Last Words Weekly\"...",
+      "Sending your details to the Grim Reaper's scheduling department...",
+      "Converting your survival strategy into interpretive dance for our analysts...",
+      "Checking if your survival plan has been featured in \"Hilarious Last Attempts\"...",
+    ],
+    'zh-TW': [
+      "正在計算您的生存機率到小數點後17位...",
+      "正在與蟑螂討論末日後的房地產情況...",
+      "正在模擬7,342個以您為主角的末日情境...",
+      "正在將您的生存本能與一株特別聰明的室內植物進行比較...",
+      "正在將您的選擇與第一章就死亡的虛構角色進行對比...",
+      "正在調查殭屍對您美味程度的評價...",
+      "正在通過我們的「肯定完蛋了」算法分析您的生存策略...",
+      "正在查閱古代預言中關於您特定死法的記載...",
+      "正在精確計算您在真正的末日中能存活的秒數...",
+      "正在與「常見遺言週刊」交叉比對您的選擇...",
+      "正在將您的資料發送到死神的預約部門...",
+      "正在將您的生存策略轉換為解釋性舞蹈供我們的分析師研究...",
+      "正在檢查您的生存計劃是否已被收錄在「搞笑的最後嘗試」中...",
+    ],
+  };
+  
+  const messagesForLocale = messages[locale] || messages['en'];
+  const randomIndex = Math.floor(Math.random() * messagesForLocale.length);
+  return messagesForLocale[randomIndex];
+}
 
 export async function evaluateSurvival(
   scenario: string,
@@ -70,6 +122,11 @@ ${instructions.structuredEvaluation}
 
 ${instructions.formatInstructions}`;
 
+    // Check if openai instance exists
+    if (!openai) {
+      throw new Error("OpenAI instance not available. This should not happen when USE_MOCK_RESPONSES is disabled.");
+    }
+
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -83,17 +140,67 @@ ${instructions.formatInstructions}`;
         },
       ],
       temperature: 0.8,
+      response_format: { type: "json_object" }, // Request JSON directly from the API
     });
 
+    // Get the raw response content
+    const responseContent = response.choices[0].message.content || "{}";
+    
     try {
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      // Parse the JSON response
+      let result;
+      
+      try {
+        // First attempt direct parsing
+        result = JSON.parse(responseContent);
+      } catch (parseError) {
+        console.error("Error parsing OpenAI response, attempting sanitization:", parseError);
+        
+        // If direct parsing fails, try to sanitize the JSON
+        const sanitizedContent = responseContent
+          .replace(/[\x00-\x1F\x7F-\x9F]/g, "") // Remove all control characters
+          .replace(/\n/g, "\\n")                // Properly escape newlines
+          .replace(/\r/g, "\\r")                // Properly escape carriage returns
+          .replace(/\t/g, "\\t")                // Properly escape tabs
+          .replace(/\\"/g, '\\\\"')             // Fix escaped quotes
+          .replace(/([^\])"([^[])/g, '$1\\"$2'); // Fix unescaped quotes
+          
+        try {
+          // Try parsing the sanitized content
+          result = JSON.parse(sanitizedContent);
+          console.log("Recovered response using sanitization");
+        } catch (secondError) {
+          // If still failing, try a more aggressive approach to extract fields
+          console.error("JSON sanitization failed, attempting manual extraction:", secondError);
+          
+          // Extract fields with regex patterns that are more tolerant of malformed JSON
+          const analysisMatch = responseContent.match(/"analysis"\s*:\s*"([^"]*)"/);
+          const deathSceneMatch = responseContent.match(/"deathScene"\s*:\s*"([^"]*)"/);
+          const rationaleMatch = responseContent.match(/"rationale"\s*:\s*"([^"]*)"/);
+          const scoreMatch = responseContent.match(/"score"\s*:\s*(\d+)/);
+          
+          result = {
+            analysis: analysisMatch ? analysisMatch[1] : "",
+            deathScene: deathSceneMatch ? deathSceneMatch[1] : "",
+            rationale: rationaleMatch ? rationaleMatch[1] : "",
+            score: scoreMatch ? parseInt(scoreMatch[1], 10) : 0
+          };
+          
+          console.log("Recovered response using manual extraction");
+        }
+      }
+      
+      // Validate the extracted fields
       if (
         typeof result.analysis === 'string' &&
         typeof result.deathScene === 'string' &&
         typeof result.rationale === 'string'
       ) {
-        // Original code always set score to 0, but we should use the value from the API
-        const evaluationResult = { ...result, score: result.score || 0 };
+        // Ensure score has a default value of 0 if not present
+        const evaluationResult = { 
+          ...result, 
+          score: typeof result.score === 'number' ? result.score : 0 
+        };
         
         // Cache the API response if caching is enabled
         if (DEV_CONFIG.CACHE_API_RESPONSES) {
@@ -103,8 +210,8 @@ ${instructions.formatInstructions}`;
         return evaluationResult;
       }
       throw new Error("Invalid response format");
-    } catch (parseError) {
-      console.error("Error parsing OpenAI response:", parseError);
+    } catch (error) {
+      console.error("Failed to process OpenAI response:", error);
       return getErrorResponse(locale);
     }
   } catch (error) {
