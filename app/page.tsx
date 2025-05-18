@@ -137,41 +137,23 @@ export default function Home() {
     });
   };
 
-  // Create the inline style with background image
-  const containerStyle = {
-    position: 'relative',
-    minHeight: '100vh',
-    padding: '2rem',
-    backgroundColor: '#111827', // bg-gray-900
-  } as React.CSSProperties;
-
-  // If we have a scenario selected and the image has loaded, add the background image
-  if (selectedScenario && imageLoaded) {
-    containerStyle.backgroundImage = `url(${selectedScenario.theme.image})`;
-    containerStyle.backgroundSize = 'cover';
-    containerStyle.backgroundPosition = 'center';
-    containerStyle.backgroundRepeat = 'no-repeat';
-  }
 
   return (
-    <div style={containerStyle}>
-      {/* Semi-transparent overlay */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(17, 24, 39, 0.7)', // Slightly transparent bg-gray-900
-          zIndex: 0,
-        }}
-      />
+    <div 
+      className="bg-fixed min-h-screen" 
+      style={{
+        backgroundColor: '#111827', // bg-gray-900
+        backgroundImage: selectedScenario && imageLoaded ? `url(${selectedScenario.theme.image})` : 'none',
+        padding: 'var(--container-padding-mobile)',
+      }}
+    >
+      {/* Semi-transparent overlay with fixed position */}
+      <div className="overlay-fixed" style={{ backgroundColor: 'rgba(17, 24, 39, 0.7)' }} />
       
-      {/* Content container */}
-      <div style={{ position: 'relative', zIndex: 1 }} className="text-gray-100">
+      {/* Content container that scrolls over the fixed background */}
+      <div className="content-scroll text-gray-100 desktop-container">
         {/* Language Selector */}
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8">
           <select
             className="bg-gray-800 text-gray-200 p-2 rounded-md border border-gray-700"
             value={locale}
@@ -185,18 +167,18 @@ export default function Home() {
           </select>
         </div>
 
-        <h1 className="text-4xl font-bold text-center mb-8 font-mono text-green-400">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 md:mb-12 font-mono text-green-400">
           {getTranslation(locale, 'appTitle')}
         </h1>
         
         {result ? (
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-gray-800 bg-opacity-90 p-8 rounded-lg border border-gray-700 mb-8">
-              <h2 className="text-2xl font-mono text-green-400 mb-4">
+          <div className="max-w-3xl mx-auto lg:max-w-4xl">
+            <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700 mb-8">
+              <h2 className="text-2xl md:text-3xl font-mono text-green-400 mb-4">
                 {highScoresTranslations[locale].evaluationComplete}
               </h2>
-              <div className="flex items-center mb-6">
-                <div className="text-6xl font-bold font-mono text-red-500 mr-4 border-r border-gray-600 pr-4">
+              <div className="flex flex-col md:flex-row items-center mb-6">
+                <div className="text-6xl font-bold font-mono text-red-500 mr-4 md:border-r border-gray-600 md:pr-4 mb-4 md:mb-0">
                   {result.score}%
                 </div>
                 <div className="text-gray-400">
@@ -248,81 +230,97 @@ export default function Home() {
         ) : (
           <>
             {/* Scenario Selection */}
-            <div className="mb-8">
-              <select
-                className="w-full p-3 bg-gray-800 bg-opacity-90 border border-gray-700 rounded-lg font-mono text-green-400"
-                value={selectedScenario?.id || ""}
-                onChange={(e) => {
-                  const scenario = APOCALYPSE_SCENARIOS.find(s => s.id === e.target.value);
-                  setSelectedScenario(scenario || null);
-                  setAnswers([]);
-                }}
-              >
-                <option value="">{getTranslation(locale, 'selectScenario')}</option>
-                {APOCALYPSE_SCENARIOS.map(scenario => {
-                  const translatedName = scenarioTranslations[scenario.id]?.[locale]?.name || scenario.name;
-                  return (
-                    <option key={scenario.id} value={scenario.id}>
-                      {translatedName}
-                    </option>
-                  );
-                })}
-              </select>
+            <div className="max-w-3xl mx-auto lg:max-w-5xl">
+              <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700 mb-8">
+                <h2 className="text-2xl md:text-3xl font-mono text-green-400 mb-6">
+                  {getTranslation(locale, 'selectScenario')}
+                </h2>
+                
+                <div className="desktop-grid">
+                  {APOCALYPSE_SCENARIOS.map((scenario) => (
+                    <div 
+                      key={scenario.id}
+                      className="border border-gray-700 bg-gray-900 bg-opacity-70 rounded-lg p-4 md:p-6 mb-4 md:mb-0 cursor-pointer transition-all hover:bg-gray-700 hover:border-gray-500"
+                      onClick={() => setSelectedScenario(scenario)}
+                    >
+                      <h3 className="text-xl md:text-2xl font-mono text-red-400 mb-2">
+                        {scenarioTranslations[scenario.id]?.[locale]?.name || scenario.name}
+                      </h3>
+                      <p className="text-gray-300 mb-2">
+                        {scenario.name}
+                      </p>
+                      <div className="text-xs text-gray-400">
+                        {getTranslation(locale, 'evaluateButton')}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Username Input */}
             {selectedScenario && (
-              <div className="mb-6">
-                <input
-                  type="text"
-                  className="w-full bg-gray-800 bg-opacity-90 text-gray-100 p-3 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500 font-mono"
-                  placeholder="Enter your username..."
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-            )}
-
-            {/* Questions */}
-            {selectedScenario && (
-              <div className="space-y-6">
-                {selectedScenario.questions.map((question, index) => (
-                  <div key={index} className="bg-gray-800 bg-opacity-90 p-6 rounded-lg border border-gray-700">
-                    <label className="block mb-3 font-mono text-green-400">
-                      {`[${index + 1}] ${getTranslatedQuestion(selectedScenario, index)}`}
-                    </label>
-                    <textarea
-                      className="w-full bg-gray-900 text-gray-100 p-3 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                      rows={3}
-                      value={answers.find(a => a.questionIndex === index)?.text || ""}
-                      onChange={(e) => handleAnswerChange(index, e.target.value)}
-                      placeholder={getTranslation(locale, 'questionPlaceholder')}
+              <div className="max-w-3xl mx-auto lg:max-w-4xl">
+                <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl md:text-2xl font-mono text-green-400">
+                      {scenarioTranslations[selectedScenario.id]?.[locale]?.name || selectedScenario.name}
+                    </h2>
+                    <button
+                      onClick={handleReset}
+                      className="bg-gray-700 text-gray-200 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-gray-600 transition-colors text-sm"
+                    >
+                      {getTranslation(locale, 'evaluateButton')}
+                    </button>
+                  </div>
+                  
+                  {/* Username input */}
+                  <div className="mb-6">
+                    <input
+                      type="text"
+                      className="w-full bg-gray-800 bg-opacity-90 text-gray-100 p-3 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500 font-mono"
+                      placeholder="Enter your username..."
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
-                ))}
+                  
+                  <div className="space-y-6">
+                    {selectedScenario.questions.map((question, index) => (
+                      <div key={index} className="bg-gray-800 bg-opacity-90 p-6 rounded-lg border border-gray-700">
+                        <label className="block mb-3 font-mono text-green-400">
+                          {`[${index + 1}] ${getTranslatedQuestion(selectedScenario, index)}`}
+                        </label>
+                        <textarea
+                          className="w-full bg-gray-900 text-gray-100 p-3 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                          rows={3}
+                          value={answers.find(a => a.questionIndex === index)?.text || ""}
+                          onChange={(e) => handleAnswerChange(index, e.target.value)}
+                          placeholder={getTranslation(locale, 'questionPlaceholder')}
+                        />
+                      </div>
+                    ))}
 
-                <button
-                  className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg font-mono mt-8 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleSubmit}
-                  disabled={loading || answers.length !== selectedScenario.questions.length}
-                >
-                  {loading ? getTranslation(locale, 'evaluatingButton') : getTranslation(locale, 'evaluateButton')}
-                </button>
+                    <div className="flex flex-col md:flex-row gap-4 justify-center mt-8">
+                      <button
+                        onClick={handleSubmit}
+                        disabled={loading || answers.length < selectedScenario.questions.length}
+                        className={`px-6 py-3 rounded-md font-mono text-lg ${
+                          loading || answers.length < selectedScenario.questions.length
+                            ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                            : "bg-green-700 text-white hover:bg-green-600 transition-colors"
+                        }`}
+                      >
+                        {loading ? getTranslation(locale, 'evaluatingButton') : getTranslation(locale, 'evaluateButton')}
+                      </button>
 
-                {error && (
-                  <div className="mt-4 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-400 font-mono">
-                    {error}
+                      {error && (
+                        <div className="mt-4 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-400 font-mono">
+                          {error}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-
-                {/* Link to high scores */}
-                <div className="mt-8 text-center">
-                  <button
-                    className="text-gray-400 hover:text-green-400 font-mono transition-colors text-sm underline"
-                    onClick={() => router.push('/highscores')}
-                  >
-                    {highScoresTranslations[locale].viewHighScores}
-                  </button>
                 </div>
               </div>
             )}
