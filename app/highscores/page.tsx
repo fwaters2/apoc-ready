@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Locale } from "../i18n";
 import { APOCALYPSE_SCENARIOS } from "../constants/scenarios";
@@ -20,6 +20,7 @@ const translations = {
     yourScore: 'YOUR SCORE',
     filterAll: 'All Scenarios',
     sorryNoSurvivors: 'Sorry, no survivors found!',
+    loading: 'Loading...',
   },
   'zh-TW': {
     title: '末日倖存者名人堂',
@@ -32,13 +33,28 @@ const translations = {
     yourScore: '你的分數',
     filterAll: '所有情境',
     sorryNoSurvivors: '抱歉，找不到倖存者！',
+    loading: '載入中...',
   }
 };
 
-export default function HighScores() {
+// Create a component that uses useSearchParams
+function HighScoreContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [locale, setLocale] = useState<Locale>('en');
+  
+  // Load locale from localStorage on component mount
+  useEffect(() => {
+    const savedLocale = localStorage.getItem('apoc-locale');
+    if (savedLocale && (savedLocale === 'en' || savedLocale === 'zh-TW')) {
+      setLocale(savedLocale as Locale);
+    }
+  }, []);
+
+  // Save locale to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('apoc-locale', locale);
+  }, [locale]);
   
   // Read user's submission from URL parameters if available
   const userName = searchParams.get('name') || '';
@@ -195,5 +211,14 @@ export default function HighScores() {
         </div>
       </main>
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function HighScores() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center font-mono text-xl">Loading...</div>}>
+      <HighScoreContent />
+    </Suspense>
   );
 } 

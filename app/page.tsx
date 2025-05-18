@@ -30,6 +30,19 @@ export default function Home() {
   const [username, setUsername] = useState<string>("Anonymous");
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  // Load locale from localStorage on component mount
+  useEffect(() => {
+    const savedLocale = localStorage.getItem('apoc-locale');
+    if (savedLocale && (savedLocale === 'en' || savedLocale === 'zh-TW')) {
+      setLocale(savedLocale as Locale);
+    }
+  }, []);
+
+  // Save locale to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('apoc-locale', locale);
+  }, [locale]);
+
   // Preload the background image when scenario changes
   useEffect(() => {
     if (selectedScenario) {
@@ -164,7 +177,7 @@ export default function Home() {
           </h1>
           
           {result ? (
-            <div className="max-w-3xl mx-auto lg:max-w-4xl">
+            <div key="results" className="max-w-3xl mx-auto lg:max-w-4xl">
               <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700 mb-8">
                 <h2 className="text-2xl md:text-3xl font-mono mb-4" style={{ color: 'var(--theme-highlight)' }}>
                   {highScoresTranslations[locale].evaluationComplete}
@@ -226,7 +239,7 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <>
+            <div key="quiz">
               {/* Scenario Selection */}
               <div className="max-w-3xl mx-auto lg:max-w-5xl">
                 <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700 mb-8">
@@ -341,7 +354,7 @@ export default function Home() {
                   </div>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </main>
