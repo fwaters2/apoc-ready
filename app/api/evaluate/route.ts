@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { evaluateSurvival } from "@/app/utils/openai";
 import type { Submission } from "@/app/types";
+import { Locale } from "@/app/i18n";
 
 export async function POST(request: Request) {
   try {
-    const body: Submission = await request.json();
+    const body: Submission & { locale?: Locale } = await request.json();
     
     if (!body.scenarioId || !body.answers || !body.answers.length) {
       return NextResponse.json(
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
       );
     }
 
+    // Get locale or default to English
+    const locale = body.locale || 'en';
+
     // Sort answers by questionIndex to ensure correct order
     const sortedAnswers = [...body.answers].sort(
       (a, b) => a.questionIndex - b.questionIndex
@@ -20,7 +24,8 @@ export async function POST(request: Request) {
     
     const result = await evaluateSurvival(
       body.scenarioId,
-      sortedAnswers.map(a => a.text)
+      sortedAnswers.map(a => a.text),
+      locale
     );
 
     const evaluation: Submission = {

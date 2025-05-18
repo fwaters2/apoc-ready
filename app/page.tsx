@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { APOCALYPSE_SCENARIOS } from "./constants/scenarios";
 import type { Answer, ApocalypseScenario, Submission } from "./types";
+import { Locale, locales, getTranslation, scenarioTranslations } from "./i18n";
 
 export default function Home() {
   const [selectedScenario, setSelectedScenario] = useState<ApocalypseScenario | null>(null);
@@ -10,6 +11,15 @@ export default function Home() {
   const [result, setResult] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [locale, setLocale] = useState<Locale>('en');
+
+  const getTranslatedQuestion = (scenario: ApocalypseScenario, index: number) => {
+    const translation = scenarioTranslations[scenario.id]?.[locale];
+    if (!translation || !translation.questions[index]) {
+      return scenario.questions[index];
+    }
+    return translation.questions[index];
+  };
 
   const handleAnswerChange = (questionIndex: number, text: string) => {
     setAnswers(prev => {
@@ -42,11 +52,12 @@ export default function Home() {
           scenarioId: selectedScenario.id,
           answers,
           name: "Anonymous", // You could add a name input field later
+          locale, // Add the current locale
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to evaluate survival chances");
+        throw new Error(getTranslation(locale, 'errorMessage'));
       }
 
       const evaluation = await response.json();
@@ -88,8 +99,23 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
+      {/* Language Selector */}
+      <div className="absolute top-4 right-4">
+        <select
+          className="bg-gray-800 text-gray-200 p-2 rounded-md border border-gray-700"
+          value={locale}
+          onChange={(e) => setLocale(e.target.value as Locale)}
+        >
+          {Object.entries(locales).map(([code, name]) => (
+            <option key={code} value={code}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <h1 className="text-4xl font-bold text-center mb-8 font-mono text-green-400">
-        APOCALYPSE READINESS ASSESSOR
+        {getTranslation(locale, 'appTitle')}
       </h1>
       
       {result ? (
@@ -101,14 +127,16 @@ export default function Home() {
                 {result.score}%
               </div>
               <div className="text-gray-400">
-                <div className="text-xl mb-1">Survival Rate</div>
+                <div className="text-xl mb-1">{getTranslation(locale, 'survivalRate')}</div>
                 <div className="text-sm font-mono text-red-400 italic">&ldquo;{result.rationale}&rdquo;</div>
               </div>
             </div>
             
             {result.analysis && (
               <div className="border-t border-gray-700 pt-6 mb-6">
-                <h3 className="text-xl font-mono text-red-400 mb-4">WHAT WERE YOU THINKING?!</h3>
+                <h3 className="text-xl font-mono text-red-400 mb-4">
+                  {getTranslation(locale, 'analysisTitle')}
+                </h3>
                 <div className="text-gray-300 leading-relaxed font-mono text-sm bg-gray-900/30 p-5 rounded border-l-4 border-red-900">
                   {formatText(result.analysis)}
                 </div>
@@ -117,7 +145,9 @@ export default function Home() {
             
             {result.deathScene && (
               <div className="border-t border-gray-700 pt-6 mb-6">
-                <h3 className="text-xl font-mono text-red-400 mb-4">YOUR INEVITABLE END:</h3>
+                <h3 className="text-xl font-mono text-red-400 mb-4">
+                  {getTranslation(locale, 'deathSceneTitle')}
+                </h3>
                 <div className="text-gray-300 leading-relaxed font-mono text-sm italic bg-gray-900/50 p-5 rounded border-l-4 border-red-900">
                   {formatText(result.deathScene)}
                 </div>
@@ -128,7 +158,7 @@ export default function Home() {
               className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg font-mono transition-colors mt-6"
               onClick={handleReset}
             >
-              TRY AGAIN, FOR THE LOVE OF GOD
+              {getTranslation(locale, 'tryAgainButton')}
             </button>
           </div>
         </div>
@@ -145,12 +175,15 @@ export default function Home() {
                 setAnswers([]);
               }}
             >
-              <option value="">SELECT YOUR APOCALYPSE</option>
-              {APOCALYPSE_SCENARIOS.map(scenario => (
-                <option key={scenario.id} value={scenario.id}>
-                  {scenario.name}
-                </option>
-              ))}
+              <option value="">{getTranslation(locale, 'selectScenario')}</option>
+              {APOCALYPSE_SCENARIOS.map(scenario => {
+                const translatedName = scenarioTranslations[scenario.id]?.[locale]?.name || scenario.name;
+                return (
+                  <option key={scenario.id} value={scenario.id}>
+                    {translatedName}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
@@ -160,14 +193,14 @@ export default function Home() {
               {selectedScenario.questions.map((question, index) => (
                 <div key={index} className="bg-gray-800 p-6 rounded-lg border border-gray-700">
                   <label className="block mb-3 font-mono text-green-400">
-                    {`[${index + 1}] ${question}`}
+                    {`[${index + 1}] ${getTranslatedQuestion(selectedScenario, index)}`}
                   </label>
                   <textarea
                     className="w-full bg-gray-900 text-gray-100 p-3 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                     rows={3}
                     value={answers.find(a => a.questionIndex === index)?.text || ""}
                     onChange={(e) => handleAnswerChange(index, e.target.value)}
-                    placeholder="Type your answer here..."
+                    placeholder={getTranslation(locale, 'questionPlaceholder')}
                   />
                 </div>
               ))}
@@ -177,7 +210,7 @@ export default function Home() {
                 onClick={handleSubmit}
                 disabled={loading || answers.length !== selectedScenario.questions.length}
               >
-                {loading ? "EVALUATING..." : "EVALUATE MY CHANCES (IF YOU DARE)"}
+                {loading ? getTranslation(locale, 'evaluatingButton') : getTranslation(locale, 'evaluateButton')}
               </button>
 
               {error && (
