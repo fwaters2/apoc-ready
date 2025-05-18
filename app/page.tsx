@@ -1,103 +1,87 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { APOCALYPSE_SCENARIOS } from "./constants/scenarios";
+import type { Answer, ApocalypseScenario } from "./types";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [selectedScenario, setSelectedScenario] = useState<ApocalypseScenario | null>(null);
+  const [answers, setAnswers] = useState<Answer[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const handleAnswerChange = (questionIndex: number, text: string) => {
+    setAnswers(prev => {
+      const newAnswers = [...prev];
+      const existingIndex = newAnswers.findIndex(a => a.questionIndex === questionIndex);
+      
+      if (existingIndex >= 0) {
+        newAnswers[existingIndex] = { questionIndex, text };
+      } else {
+        newAnswers.push({ questionIndex, text });
+      }
+      
+      return newAnswers;
+    });
+  };
+
+  const handleSubmit = async () => {
+    // TODO: Implement submission logic
+    console.log("Submitting answers:", answers);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-8 font-mono text-green-400">
+          APOCALYPSE READINESS ASSESSOR
+        </h1>
+        
+        {/* Scenario Selection */}
+        <div className="mb-8">
+          <select
+            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg font-mono text-green-400"
+            value={selectedScenario?.id || ""}
+            onChange={(e) => {
+              const scenario = APOCALYPSE_SCENARIOS.find(s => s.id === e.target.value);
+              setSelectedScenario(scenario || null);
+              setAnswers([]);
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <option value="">SELECT YOUR APOCALYPSE</option>
+            {APOCALYPSE_SCENARIOS.map(scenario => (
+              <option key={scenario.id} value={scenario.id}>
+                {scenario.name}
+              </option>
+            ))}
+          </select>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Questions */}
+        {selectedScenario && (
+          <div className="space-y-6">
+            {selectedScenario.questions.map((question, index) => (
+              <div key={index} className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                <label className="block mb-3 font-mono text-green-400">
+                  {`[${index + 1}] ${question}`}
+                </label>
+                <textarea
+                  className="w-full p-3 bg-gray-900 border border-gray-700 rounded text-gray-100 font-mono"
+                  rows={3}
+                  value={answers.find(a => a.questionIndex === index)?.text || ""}
+                  onChange={(e) => handleAnswerChange(index, e.target.value)}
+                  placeholder="Type your answer here..."
+                />
+              </div>
+            ))}
+
+            <button
+              className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg font-mono mt-8 transition-colors"
+              onClick={handleSubmit}
+            >
+              EVALUATE SURVIVAL CHANCES
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
