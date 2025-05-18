@@ -279,13 +279,6 @@ export default function Home() {
                       <h2 className="text-xl md:text-2xl font-mono" style={{ color: 'var(--theme-highlight)' }}>
                         {scenarioTranslations[selectedScenario.id]?.[locale]?.name || selectedScenario.name}
                       </h2>
-                      <button
-                        onClick={handleReset}
-                        className="text-gray-200 px-3 py-1 md:px-4 md:py-2 rounded transition-colors text-sm hover:opacity-90"
-                        style={{ backgroundColor: 'var(--theme-accent)' }}
-                      >
-                        {getTranslation(locale, 'evaluateButton')}
-                      </button>
                     </div>
                     
                     {/* Username input */}

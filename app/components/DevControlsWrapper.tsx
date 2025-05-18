@@ -8,5 +8,8 @@ const DevControls = dynamic(() => import("./DevControls"), {
 });
 
 export default function DevControlsWrapper() {
+  // Don't render the component in production
+  if (process.env.NODE_ENV === "production") return null;
+  
   return <DevControls />;
 } 
