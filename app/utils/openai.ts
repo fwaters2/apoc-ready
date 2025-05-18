@@ -78,6 +78,9 @@ export async function evaluateSurvival(
   locale: Locale = 'en'
 ): Promise<EvaluationResponse> {
   try {
+    console.log(`Evaluating survival for scenario: ${scenario}`);
+    console.log(`Mock responses enabled: ${DEV_CONFIG.USE_MOCK_RESPONSES}`);
+    
     // Create a cache key for this evaluation
     const cacheKey = apiCache.createEvaluationKey(scenario, answers, locale);
     
@@ -88,9 +91,9 @@ export async function evaluateSurvival(
       if (cachedResponse) return cachedResponse;
     }
     
-    // Use mock responses in development mode
+    // Use mock responses in development mode or when forced in production
     if (DEV_CONFIG.USE_MOCK_RESPONSES) {
-      console.log("[DEV] Using mock response for scenario:", scenario);
+      console.log(`Using mock response for scenario: ${scenario}`);
       
       // Simulate API delay if configured
       if (DEV_CONFIG.MOCK_RESPONSE_DELAY > 0) {
@@ -98,7 +101,33 @@ export async function evaluateSurvival(
       }
       
       // Get mock response for this scenario and locale, or fallback to error response
-      const mockResponse = mockEvaluationResponses[scenario]?.[locale] || getErrorResponse(locale);
+      let mockResponse;
+      try {
+        // Try to get a specific mock response for this scenario
+        mockResponse = mockEvaluationResponses[scenario]?.[locale];
+        
+        // If no scenario-specific mock is found, try to get one from any available scenario
+        if (!mockResponse) {
+          console.log(`No mock for scenario "${scenario}" and locale "${locale}", trying fallback...`);
+          // Get all available scenarios
+          const availableScenarios = Object.keys(mockEvaluationResponses);
+          if (availableScenarios.length > 0) {
+            // Use the first available scenario as fallback
+            const fallbackScenario = availableScenarios[0];
+            mockResponse = mockEvaluationResponses[fallbackScenario]?.[locale] || 
+                          mockEvaluationResponses[fallbackScenario]?.['en'];
+            console.log(`Using fallback mock from scenario "${fallbackScenario}"`);
+          }
+        }
+      } catch (mockError) {
+        console.error("Error accessing mock data:", mockError);
+      }
+      
+      // If still no response, use the error response
+      if (!mockResponse) {
+        console.log("No suitable mock found, using error response");
+        mockResponse = getErrorResponse(locale);
+      }
       
       // Cache the mock response if caching is enabled
       if (DEV_CONFIG.CACHE_API_RESPONSES) {
