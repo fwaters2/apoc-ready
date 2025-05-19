@@ -11,6 +11,8 @@
   "dependencies": {
     "next": "15.3.2",
     "openai": "^4.100.0",
+    "posthog-js": "^1.242.2",
+    "posthog-node": "^4.17.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
