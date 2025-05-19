@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Locale, locales } from "../i18n";
 
 // Add translations for header
@@ -27,10 +28,15 @@ export default function Header({ locale, setLocale }: HeaderProps) {
         <div className="flex items-center">
           <Link 
             href="/"
-            className="font-mono text-sm sm:text-base tracking-wider hover:opacity-80 transition-opacity" 
-            style={{ color: 'var(--theme-highlight)' }}
+            className="font-mono hover:opacity-80 transition-opacity flex items-center" 
           >
-            APOC
+            <Image 
+              src="/logo.png" 
+              alt="Apoc" 
+              width={60} 
+              height={30} 
+              className="h-8 sm:h-8 w-auto"
+            />
           </Link>
         </div>
         
