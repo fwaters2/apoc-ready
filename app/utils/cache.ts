@@ -42,11 +42,6 @@ class ApiCache {
     return !!entry && Date.now() <= entry.timestamp + entry.expiry;
   }
   
-  // Delete a specific key
-  delete(key: string): void {
-    this.cache.delete(key);
-  }
-  
   // Clear all cache entries
   clear(): void {
     this.cache.clear();
