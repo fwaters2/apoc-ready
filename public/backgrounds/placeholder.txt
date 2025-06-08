@@ -1,8 +1,0 @@
-Background Images for Apocalypse Scenarios
-
-This directory contains the background images used for different apocalyptic scenarios:
-
-1. zombie.png - A dark, gritty urban landscape with abandoned buildings
-2. alien.png - A sci-fi themed image with UFOs or alien structures
-
-Images should be 16:9 aspect ratio and at least 1920x1080px resolution. 

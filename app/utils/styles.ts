@@ -1,4 +1,4 @@
-import { CONSOLIDATED_SCENARIOS } from "../constants/scenarios";
+import { SCENARIOS } from "../constants/scenarios";
 
 /**
  * Generates CSS variables for all scenarios from consolidated data
@@ -8,7 +8,7 @@ export function generateScenarioCSS(): string {
   let css = ':root {\n';
   
   // Generate CSS variables for each scenario
-  CONSOLIDATED_SCENARIOS.forEach(scenario => {
+  SCENARIOS.forEach(scenario => {
     const { id, theme } = scenario;
     css += `  --${id}-primary: ${theme.colors.primary};\n`;
     css += `  --${id}-secondary: ${theme.colors.secondary};\n`;
@@ -20,7 +20,7 @@ export function generateScenarioCSS(): string {
   css += '}\n\n';
   
   // Generate theme classes for each scenario
-  CONSOLIDATED_SCENARIOS.forEach(scenario => {
+  SCENARIOS.forEach(scenario => {
     const { id } = scenario;
     css += `.theme-${id} {\n`;
     css += `  --theme-primary: var(--${id}-primary);\n`;
@@ -63,7 +63,7 @@ export function injectScenarioStyles(): void {
  * Useful for inline styles or CSS-in-JS
  */
 export function getScenarioColors(scenarioId: string) {
-  const scenario = CONSOLIDATED_SCENARIOS.find(s => s.id === scenarioId);
+  const scenario = SCENARIOS.find(s => s.id === scenarioId);
   if (!scenario) return null;
   
   return {

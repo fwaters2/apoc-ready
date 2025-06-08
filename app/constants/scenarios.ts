@@ -1,25 +1,7 @@
-import { ApocalypseScenario, ConsolidatedScenario } from "../types";
-
-// Base prompt template function to eliminate duplication
-function createPromptTemplate(scenarioName: string): string {
-  return `Given the following ${scenarioName.toLowerCase()} scenario and user answers, evaluate their likelihood of survival. Channel comedian Bill Burr's style throughout ALL sections - use his direct, cynical, exasperated rants about the absurdity of people's choices, with ALL CAPS for emphasis and lots of rhetorical questions.
-Scenario: ${scenarioName}
-Answers:
-{{answers}}
-
-Provide a structured evaluation with ALL sections in Bill Burr's comedic voice:
-
-1. ANALYSIS: Express exasperated disbelief at their choices, use rhetorical questions, and build up a rant about how each choice is worse than the last. Use Bill Burr's signature phrases and comedic timing.
-
-2. DEATH_SCENE: Write this EXACTLY like Bill Burr would describe it in a stand-up routine - with his characteristic rants, interrupting himself, using ALL CAPS for emphasis, and expressing complete disbelief at the user's stupidity. Make it a comedic, absurd scene showing the inevitable consequences of their terrible choices.
-
-3. SCORE_AND_RATIONALE: Write a one-sentence rationale in pure Bill Burr style - cynical, blunt, with his signature exasperated tone. Make it sound like something he would yell during a podcast rant.
-
-Respond with properly formatted JSON containing these sections.`;
-}
+import { ConsolidatedScenario } from "../types";
 
 // Consolidated scenario configurations - single source of truth
-export const CONSOLIDATED_SCENARIOS: ConsolidatedScenario[] = [
+export const SCENARIOS: ConsolidatedScenario[] = [
   {
     id: "zombie",
     name: {
@@ -178,25 +160,3 @@ export const CONSOLIDATED_SCENARIOS: ConsolidatedScenario[] = [
   }
 ];
 
-// Helper function to get prompt template for a scenario
-export function getPromptTemplate(scenario: ConsolidatedScenario): string {
-  return createPromptTemplate(scenario.name.en);
-}
-
-// Compatibility layer - convert consolidated scenarios to legacy format
-export const APOCALYPSE_SCENARIOS: ApocalypseScenario[] = CONSOLIDATED_SCENARIOS.map(scenario => ({
-  id: scenario.id,
-  name: scenario.name.en, // Default to English for legacy compatibility
-  theme: {
-    image: scenario.theme.backgroundImage,
-    colorPalette: [
-      scenario.theme.colors.primary,
-      scenario.theme.colors.secondary,
-      scenario.theme.colors.accent,
-      scenario.theme.colors.text,
-      scenario.theme.colors.highlight
-    ]
-  },
-  questions: scenario.questions.map(q => q.en), // Default to English for legacy compatibility
-  promptTemplate: getPromptTemplate(scenario)
-})); 

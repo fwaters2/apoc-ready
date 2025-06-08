@@ -1,16 +1,4 @@
-// Legacy interface - keep for backward compatibility during transition
-export type ApocalypseScenario = {
-  id: string;
-  name: string;
-  theme: {
-    image: string;
-    colorPalette: string[];
-  };
-  questions: string[];
-  promptTemplate: string;
-};
-
-// New consolidated interface that captures all scenario data
+// Consolidated interface that captures all scenario data
 export interface ConsolidatedScenario {
   // Core identification
   id: string;
@@ -37,12 +25,6 @@ export interface ConsolidatedScenario {
     };
   };
 }
-
-// Utility type for accessing scenario translations
-export type ScenarioTranslation = {
-  name: string;
-  questions: string[];
-};
 
 export type Answer = {
   questionIndex: number;

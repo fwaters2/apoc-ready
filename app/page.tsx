@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CONSOLIDATED_SCENARIOS } from "./constants/scenarios";
+import { SCENARIOS } from "./constants/scenarios";
 import type { Answer, ConsolidatedScenario, Submission } from "./types";
 import { Locale, getTranslation } from "./i18n";
 import Header from "./components/Header";
@@ -259,7 +259,7 @@ export default function Home() {
                   </h2>
                   
                   <div className="desktop-grid">
-                    {CONSOLIDATED_SCENARIOS.map((scenario) => (
+                    {SCENARIOS.map((scenario) => (
                       <div 
                         key={scenario.id}
                         className="border border-gray-700 bg-gray-900 bg-opacity-70 rounded-lg p-4 md:p-6 mb-4 md:mb-0 cursor-pointer transition-all hover:bg-gray-700 hover:border-gray-500"

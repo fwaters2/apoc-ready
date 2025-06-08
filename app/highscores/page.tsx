@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Locale } from "../i18n";
-import { APOCALYPSE_SCENARIOS } from "../constants/scenarios";
+import { SCENARIOS } from "../constants/scenarios";
 import { getMockHighScores, scoreComments, getRandomHighScorePosition, HighScore } from "../data/mockHighScores";
 import Header from "../components/Header";
 
@@ -112,9 +112,9 @@ function HighScoreContent() {
   
   // Get scenario name
   const getScenarioName = (scenarioId: string) => {
-    const scenario = APOCALYPSE_SCENARIOS.find(s => s.id === scenarioId);
+    const scenario = SCENARIOS.find(s => s.id === scenarioId);
     if (!scenario) return scenarioId;
-    return scenario.name;
+    return scenario.name[locale];
   };
   
   // Get score comment
@@ -148,9 +148,9 @@ function HighScoreContent() {
               onChange={(e) => setFilter(e.target.value)}
             >
               <option value="all">{translations[locale].filterAll}</option>
-              {APOCALYPSE_SCENARIOS.map(scenario => (
+              {SCENARIOS.map(scenario => (
                 <option key={scenario.id} value={scenario.id}>
-                  {getScenarioName(scenario.id)}
+                  {scenario.name[locale]}
                 </option>
               ))}
             </select>
