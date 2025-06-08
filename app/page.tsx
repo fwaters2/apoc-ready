@@ -266,7 +266,7 @@ export default function Home() {
                         onClick={() => setSelectedScenario(scenario)}
                       >
                         <h3 className="text-xl md:text-2xl font-mono mb-2" style={{ 
-                          color: scenario.id === 'zombie' ? 'var(--zombie-secondary)' : 'var(--alien-secondary)' 
+                          color: `var(--${scenario.id}-secondary, var(--theme-secondary))` 
                         }}>
                           {scenarioTranslations[scenario.id]?.[locale]?.name || scenario.name}
                         </h3>

@@ -104,5 +104,49 @@ export const scenarioTranslations: ScenarioLocaleTranslations = {
         "如果談判失敗，你的備用計劃是什麼？",
       ]
     }
+  },
+  'ai-takeover': {
+    'en': {
+      name: 'AI Takeover',
+      questions: [
+        "What's your strategy for avoiding AI detection systems?",
+        "How would you disable or hack into the AI network?",
+        "Where would you find shelter from robot patrols?",
+        "What analog tools would you rely on in a digital world?",
+        "How would you organize human resistance against the machines?",
+      ]
+    },
+    'zh-TW': {
+      name: 'AI 接管',
+      questions: [
+        "你避開AI偵測系統的策略是什麼？",
+        "你會如何癱瘓或駭入AI網路？",
+        "你會在哪裡躲避機器人巡邏？",
+        "在數位世界中，你會依賴什麼類比工具？",
+        "你會如何組織人類對抗機器的抵抗？",
+      ]
+    }
+  },
+  'asteroid-impact': {
+    'en': {
+      name: 'Asteroid Impact',
+      questions: [
+        "Where would you go to survive the initial impact?",
+        "What supplies would you stockpile for the nuclear winter?",
+        "How would you find or create breathable air?",
+        "What's your plan for finding food in the post-impact wasteland?",
+        "How would you stay warm during the endless winter?",
+      ]
+    },
+    'zh-TW': {
+      name: '小行星撞擊',
+      questions: [
+        "你會去哪裡躲避初期的撞擊？",
+        "你會為核子冬天囤積什麼物資？",
+        "你會如何找到或製造可呼吸的空氣？",
+        "在撞擊後的荒地中尋找食物的計劃是什麼？",
+        "在無盡的冬天中你會如何保暖？",
+      ]
+    }
   }
 }; 

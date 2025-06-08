@@ -21,6 +21,18 @@
   --alien-text: #ccffdd;
   --alien-highlight: #33dd55;
   
+  --ai-takeover-primary: #1A1A2E;
+  --ai-takeover-secondary: #E94560;
+  --ai-takeover-accent: #16213E;
+  --ai-takeover-text: #F4F4F4;
+  --ai-takeover-highlight: #0F3460;
+  
+  --asteroid-impact-primary: #8B4513;
+  --asteroid-impact-secondary: #F4A460;
+  --asteroid-impact-accent: #CD853F;
+  --asteroid-impact-text: #FFF8DC;
+  --asteroid-impact-highlight: #D2691E;
+  
   /* Default theme (can be either zombie or alien) */
   --theme-primary: var(--zombie-primary);
   --theme-secondary: var(--zombie-secondary);
@@ -95,6 +107,22 @@ body {
   --theme-accent: var(--alien-accent);
   --theme-text: var(--alien-text);
   --theme-highlight: var(--alien-highlight);
+}
+
+.theme-ai-takeover {
+  --theme-primary: var(--ai-takeover-primary);
+  --theme-secondary: var(--ai-takeover-secondary);
+  --theme-accent: var(--ai-takeover-accent);
+  --theme-text: var(--ai-takeover-text);
+  --theme-highlight: var(--ai-takeover-highlight);
+}
+
+.theme-asteroid-impact {
+  --theme-primary: var(--asteroid-impact-primary);
+  --theme-secondary: var(--asteroid-impact-secondary);
+  --theme-accent: var(--asteroid-impact-accent);
+  --theme-text: var(--asteroid-impact-text);
+  --theme-highlight: var(--asteroid-impact-highlight);
 }
 
 /* Desktop breakpoints */
