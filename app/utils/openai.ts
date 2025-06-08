@@ -160,12 +160,14 @@ ${instructions.formatInstructions}`;
           const deathSceneMatch = responseContent.match(/"deathScene"\s*:\s*"([^"]*)"/);
           const rationaleMatch = responseContent.match(/"rationale"\s*:\s*"([^"]*)"/);
           const scoreMatch = responseContent.match(/"score"\s*:\s*(\d+)/);
+          const survivalTimeMatch = responseContent.match(/"survivalTimeMs"\s*:\s*(\d+)/);
           
           result = {
             analysis: analysisMatch ? analysisMatch[1] : "",
             deathScene: deathSceneMatch ? deathSceneMatch[1] : "",
             rationale: rationaleMatch ? rationaleMatch[1] : "",
-            score: scoreMatch ? parseInt(scoreMatch[1], 10) : 0
+            score: scoreMatch ? parseInt(scoreMatch[1], 10) : 0,
+            survivalTimeMs: survivalTimeMatch ? parseInt(survivalTimeMatch[1], 10) : 0
           };
           
           console.log("Recovered response using manual extraction");
@@ -179,9 +181,11 @@ ${instructions.formatInstructions}`;
         typeof result.rationale === 'string'
       ) {
         // Always set score to 0 regardless of what was returned
+        // If survivalTimeMs is not provided, default to a random time between 1 minute and 48 hours
         const evaluationResult = { 
           ...result, 
-          score: 0 
+          score: 0,
+          survivalTimeMs: result.survivalTimeMs || Math.floor(Math.random() * (172800000 - 60000) + 60000) // 1 min to 48 hours
         };
         
         // Cache the API response if caching is enabled
@@ -221,12 +225,15 @@ function getInstructions(locale: Locale): InstructionSet {
 
 2. DEATH_SCENE: Write this with absurdly specific details, comically unlikely coincidences, and cosmic irony. Describe the inevitable yet improbable consequences of their choices with a tone of detached interest, as if narrating a nature documentary about a particularly unfortunate species.
 
-3. SCORE_AND_RATIONALE: Write a rationale using dry, matter-of-fact statements about utterly absurd conclusions. Comment on the cosmic insignificance of their choices while simultaneously noting how spectacularly unique their particular form of failure is.`,
+3. SURVIVAL_TIME: Calculate how long they survived from the start of the apocalypse in milliseconds, based on the death scene. Consider both the severity of their choices and the comedic timing. Use very short times (500-5000ms) for immediate disasters, moderate times (hours to days in milliseconds) for gradual failures, and longer times (weeks in milliseconds) for surprisingly persistent but ultimately doomed strategies.
+
+4. SCORE_AND_RATIONALE: Write a rationale using dry, matter-of-fact statements about utterly absurd conclusions. Comment on the cosmic insignificance of their choices while simultaneously noting how spectacularly unique their particular form of failure is.`,
       
       formatInstructions: `Format your response EXACTLY like this example, with no other text:
 {
   "analysis": "• Hiding in the basement: Statistically speaking, basements during apocalyptic events become the second most dangerous place to hide, narrowly beating out active volcanoes but falling just behind anywhere with a neon sign reading 'Free Food'.\n• Kitchen knife: A kitchen knife during the apocalypse serves approximately the same function as a paper airplane in a hurricane - technically it's still a knife, but practically speaking it's more of a very brief distraction.\n• Suburban house: Choosing a suburban house is remarkably efficient, as it combines the disadvantages of urban density with none of the advantages of rural isolation.\n• Cooking skills: When facing the end of civilization, cooking skills rank just below 'able to recite poetry' and just above 'excellent at mini-golf' in terms of survival utility.\n• Compassion: Compassion during an apocalypse is nature's way of ensuring population control.",
   "deathScene": "On the third day of the apocalypse, an improbable series of events unfolded with mathematical precision. Your basement, which had maintained a rather pleasant 68 degrees until that point, became the exact temperature preferred by a particularly large swarm of mutated insects. They were quite surprised to find you there with your kitchen knife, as they had specifically evolved to be immune to cutlery. In a moment of compassion, you decided not to swat them, unaware that in their newly evolved social structure, not being swatted is considered a marriage proposal. Your last thoughts, as your new insect spouses began the traditional honeymoon ritual, were statistically identical to the last thoughts of 83% of apocalypse victims: a resigned 'Well, this is unfortunate.'",
+  "survivalTimeMs": 259200000,
   "score": 0,
   "rationale": "Your survival strategy ranks somewhere between 'wearing a meat suit to a predator convention' and 'using fireworks as umbrella substitutes' - technically actions one could take, but with outcomes so predictably unfortunate they almost achieve a kind of mathematical elegance."
 }`,
@@ -243,12 +250,15 @@ function getInstructions(locale: Locale): InstructionSet {
 
 2. 死亡場景：使用荒謬的具體細節、滑稽的不太可能的巧合和宇宙諷刺來描述。以一種超然的興趣語調描述他們選擇的必然而不可能的後果，就像在為一個特別不幸的物種旁白自然紀錄片一樣。
 
-3. 分數和理由：使用乾巴巴、實事求是的陳述來描述完全荒謬的結論。評論他們選擇在宇宙中的微不足道，同時指出他們特定形式的失敗是多麼獨特。`,
+3. 生存時間：根據死亡場景計算他們從末日開始存活了多長時間（以毫秒為單位）。考慮他們選擇的嚴重性和喜劇時機。對於立即災難使用非常短的時間（500-5000毫秒），對於漸進失敗使用中等時間（小時到天的毫秒），對於令人驚訝的持久但最終注定失敗的策略使用較長時間（週的毫秒）。
+
+4. 分數和理由：使用乾巴巴、實事求是的陳述來描述完全荒謬的結論。評論他們選擇在宇宙中的微不足道，同時指出他們特定形式的失敗是多麼獨特。`,
       
       formatInstructions: `請確保你的回應完全符合以下格式，不要添加其他文本：
 {
   "analysis": "• 躲在地下室：從統計學角度來看，地下室在末日事件中成為第二危險的藏身之處，僅次於任何標有「免費食物」霓虹燈的地方。\n• 廚房刀：在末日中使用廚房刀的功能大約相當於颶風中的紙飛機 - 從技術上講它仍然是一把刀，但實際上它更像是一個非常短暫的分心物。\n• 郊區房子：選擇郊區房子是非常高效的，因為它結合了城市密度的缺點，卻沒有鄉村隔離的任何優點。\n• 烹飪技能：面對文明的終結，烹飪技能的實用性排名剛好低於「能夠背誦詩歌」，高於「擅長迷你高爾夫」。\n• 同情心：在末日期間表現同情心是自然界確保人口控制的方式。",
   "deathScene": "在末日的第三天，一系列不太可能的事件以數學般的精確度展開。你的地下室，直到那時一直保持著相當宜人的20度溫度，變成了特別大的變異昆蟲群喜歡的確切溫度。它們對在那裡發現拿著廚房刀的你感到相當驚訝，因為它們已經特別進化到免疫刀具。出於同情心，你決定不拍打它們，卻不知道在它們新進化的社會結構中，不被拍打被視為求婚。當你的新昆蟲配偶們開始傳統的蜜月儀式時，你的最後想法在統計上與83%的末日受害者的最後想法相同：一種無奈的「嗯，這真不幸。」",
+  "survivalTimeMs": 259200000,
   "score": 0,
   "rationale": "你的生存策略排名介於「在掠食者大會上穿著肉製服裝」和「把煙花當作雨傘替代品」之間 - 技術上是人們可以採取的行動，但其結果如此可預見地不幸，幾乎達到了一種數學上的優雅。"
 }`,

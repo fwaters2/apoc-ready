@@ -8,16 +8,19 @@ import { Locale, getTranslation } from "./i18n";
 import Header from "./components/Header";
 import { getLoadingMessage } from "./utils/messages";
 import { injectScenarioStyles } from "./utils/styles";
+import { formatSurvivalTime } from "./utils/timeUtils";
 
 // Add translations for high scores link
 const highScoresTranslations = {
   'en': {
     viewHighScores: 'VIEW HALL OF FAME',
     evaluationComplete: 'EVALUATION COMPLETE',
+    timeSurvived: 'Time Survived',
   },
   'zh-TW': {
     viewHighScores: '查看名人堂',
     evaluationComplete: '評估完成',
+    timeSurvived: '生存時間',
   }
 };
 
@@ -139,11 +142,13 @@ export default function Home() {
 
   const handleViewHighScores = () => {
     if (result) {
-      router.push(`/highscores?name=${encodeURIComponent(result.name)}&scenarioId=${encodeURIComponent(result.scenarioId)}&score=${encodeURIComponent(result.score || 0)}&timestamp=${encodeURIComponent(result.timestamp || '')}`);
+      router.push(`/highscores?name=${encodeURIComponent(result.name)}&scenarioId=${encodeURIComponent(result.scenarioId)}&score=${encodeURIComponent(result.score || 0)}&timestamp=${encodeURIComponent(result.timestamp || '')}&survivalTimeMs=${encodeURIComponent(result.survivalTimeMs || 0)}`);
     } else {
       router.push('/highscores');
     }
   };
+
+
 
   // Format text with special handling for ALL CAPS and exclamation marks
   const formatText = (text: string = "") => {
@@ -197,10 +202,20 @@ export default function Home() {
                   <div className="text-6xl font-bold font-mono mr-4 md:border-r border-gray-600 md:pr-4 mb-4 md:mb-0" style={{ color: 'var(--theme-primary)' }}>
                     {result.score}%
                   </div>
-                  <div className="text-gray-400">
+                  <div className="text-gray-400 flex-1">
                     <div className="text-xl mb-1">{getTranslation(locale, 'survivalRate')}</div>
                     <div className="text-sm font-mono italic" style={{ color: 'var(--theme-secondary)' }}>&ldquo;{result.rationale}&rdquo;</div>
                   </div>
+                  {result.survivalTimeMs && (
+                    <div className="md:border-l border-gray-600 md:pl-4 mt-4 md:mt-0">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold font-mono" style={{ color: 'var(--theme-accent)' }}>
+                          {formatSurvivalTime(result.survivalTimeMs)}
+                        </div>
+                        <div className="text-sm text-gray-400">{highScoresTranslations[locale].timeSurvived}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 {result.analysis && (

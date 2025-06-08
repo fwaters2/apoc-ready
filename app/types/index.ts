@@ -40,6 +40,7 @@ export type Submission = {
   analysis?: string;
   deathScene?: string;
   rationale?: string;
+  survivalTimeMs?: number;
   timestamp?: string;
   // Development mode indicators
   isDevelopmentMode?: boolean;

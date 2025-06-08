@@ -5,6 +5,7 @@ export type EvaluationResponse = {
   analysis: string;
   deathScene: string;
   rationale: string;
+  survivalTimeMs: number; // Time survived from start of apocalypse in milliseconds
 };
 
 /**
@@ -57,13 +58,15 @@ export function getErrorResponse(locale: Locale): EvaluationResponse {
       score: 0,
       analysis: "Our analysis system has encountered what scientists technically refer to as 'a bit of a problem.' After careful examination of your survival strategy, the computer has politely declined to continue processing, which is rather concerning considering computers rarely have opinions.",
       deathScene: "In an unprecedented display of computational stubbornness, your survival plan has managed to completely confuse our analysis systems. This is rather like trying to divide by zero - technically possible to attempt, but with results so spectacularly unhelpful that even discussing them becomes somewhat philosophical.",
-      rationale: "Your survival plan defies categorization in any known system of measurement, as it appears to exist in a quantum state of being simultaneously too creative and not creative enough."
+      rationale: "Your survival plan defies categorization in any known system of measurement, as it appears to exist in a quantum state of being simultaneously too creative and not creative enough.",
+      survivalTimeMs: 0
     },
     'zh-TW': {
       score: 0,
       analysis: "我們的分析系統遇到了科學家技術上稱為「有點小問題」的情況。在仔細檢查你的生存策略後，電腦已禮貌地拒絕繼續處理，考慮到電腦很少有意見，這相當令人擔憂。",
       deathScene: "在一場前所未有的計算頑固性展示中，你的生存計劃已成功地完全混淆了我們的分析系統。這有點像嘗試除以零 - 技術上可以嘗試，但結果如此驚人地無用，以至於討論它們變得有些哲學性。",
-      rationale: "你的生存計劃在任何已知的測量系統中都無法分類，因為它似乎存在於一種量子狀態，同時既太有創意又不夠有創意。"
+      rationale: "你的生存計劃在任何已知的測量系統中都無法分類，因為它似乎存在於一種量子狀態，同時既太有創意又不夠有創意。",
+      survivalTimeMs: 0
     }
   };
   

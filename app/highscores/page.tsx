@@ -6,6 +6,7 @@ import { Locale } from "../i18n";
 import { SCENARIOS } from "../constants/scenarios";
 import { getMockHighScores, scoreComments, getRandomHighScorePosition, HighScore } from "../data/mockHighScores";
 import Header from "../components/Header";
+import { formatSurvivalTime } from "../utils/timeUtils";
 
 // Add translations for high scores page
 const translations = {
@@ -16,6 +17,7 @@ const translations = {
     name: 'Username',
     scenario: 'Scenario',
     score: 'Score',
+    survivalTime: 'Time Survived',
     backToAssessment: 'BACK TO ASSESSMENT',
     yourScore: 'YOUR SCORE',
     filterAll: 'All Scenarios',
@@ -29,6 +31,7 @@ const translations = {
     name: '用戶名',
     scenario: '情境',
     score: '分數',
+    survivalTime: '生存時間',
     backToAssessment: '返回評估',
     yourScore: '你的分數',
     filterAll: '所有情境',
@@ -60,6 +63,7 @@ function HighScoreContent() {
   const userName = searchParams.get('name') || '';
   const scenarioId = searchParams.get('scenarioId') || '';
   const userScore = parseInt(searchParams.get('score') || '0', 10);
+  const userSurvivalTimeMs = parseInt(searchParams.get('survivalTimeMs') || '0', 10);
   const timestamp = searchParams.get('timestamp') || new Date().toISOString();
   
   // State for high scores
@@ -69,6 +73,8 @@ function HighScoreContent() {
   
   // Create user's entry if we have parameters
   const hasUserEntry = !!userName && !!scenarioId && !!userScore;
+  
+
   
   // Initialize high scores with user's score inserted
   useEffect(() => {
@@ -85,21 +91,23 @@ function HighScoreContent() {
         scenarioId,
         score: userScore,
         timestamp,
+        survivalTimeMs: userSurvivalTimeMs || Math.floor(Math.random() * (86400000 - 1000) + 1000) // Use provided survival time or random fallback
       };
       
       // Insert user at the selected position
       scores.splice(position, 0, userEntry);
     }
     
-    // Sort scores by score (descending) and then by timestamp (most recent first)
+    // Sort scores by survival time (descending), then by score (descending), then by timestamp (most recent first)
     const sortedScores = scores.sort((a, b) => {
+      if (b.survivalTimeMs !== a.survivalTimeMs) return b.survivalTimeMs - a.survivalTimeMs;
       if (b.score !== a.score) return b.score - a.score;
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     });
     
     setHighScores(sortedScores);
     setFilteredScores(sortedScores);
-  }, [hasUserEntry, userName, scenarioId, userScore, timestamp]);
+  }, [hasUserEntry, userName, scenarioId, userScore, userSurvivalTimeMs, timestamp]);
   
   // Filter scores when filter changes
   useEffect(() => {
@@ -165,6 +173,7 @@ function HighScoreContent() {
                   <th className="px-4 py-3 text-left">{translations[locale].name}</th>
                   <th className="px-4 py-3 text-left">{translations[locale].scenario}</th>
                   <th className="px-4 py-3 text-left">{translations[locale].score}</th>
+                  <th className="px-4 py-3 text-left">{translations[locale].survivalTime}</th>
                 </tr>
               </thead>
               <tbody>
@@ -185,12 +194,13 @@ function HighScoreContent() {
                         </td>
                         <td className="px-4 py-3">{getScenarioName(score.scenarioId)}</td>
                         <td className="px-4 py-3 font-mono font-bold text-red-500">{score.score}%</td>
+                        <td className="px-4 py-3">{formatSurvivalTime(score.survivalTimeMs)}</td>
                       </tr>
                     );
                   })
                 ) : (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
+                    <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
                       {translations[locale].sorryNoSurvivors}
                     </td>
                   </tr>

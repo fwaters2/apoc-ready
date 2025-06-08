@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         analysis: result.analysis,
         deathScene: result.deathScene,
         rationale: result.rationale,
+        survivalTimeMs: result.survivalTimeMs,
         timestamp: new Date().toISOString(),
       };
 
