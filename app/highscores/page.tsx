@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Locale } from "../i18n";
 import { SCENARIOS } from "../constants/scenarios";
 import { getMockHighScores, scoreComments, getRandomHighScorePosition, HighScore } from "../data/mockHighScores";
+import { getGlobalLeaderboard, StoredResult } from "../utils/kvStore";
 import Header from "../components/Header";
 import { formatSurvivalTime } from "../utils/timeUtils";
 
@@ -76,37 +77,93 @@ function HighScoreContent() {
   
 
   
-  // Initialize high scores with user's score inserted
+  // Convert StoredResult to HighScore format
+  const convertStoredResultToHighScore = (storedResult: StoredResult): HighScore => {
+    return {
+      id: storedResult.id,
+      name: storedResult.name,
+      scenarioId: storedResult.scenarioId,
+      score: storedResult.score || 0,
+      timestamp: storedResult.timestamp || new Date(storedResult.createdAt).toISOString(),
+      survivalTimeMs: storedResult.survivalTimeMs || 0
+    };
+  };
+
+  // Initialize high scores with real database data and mock data combined
   useEffect(() => {
-    const scores = getMockHighScores();
+    const loadHighScores = async () => {
+      try {
+        // Get real data from database
+        const [globalLeaderboard] = await Promise.all([
+          getGlobalLeaderboard(50) // Get top 50 real results
+        ]);
+        
+        // Convert real results to HighScore format
+        const realScores: HighScore[] = globalLeaderboard.map(convertStoredResultToHighScore);
+        
+        // Get mock data
+        const mockScores = getMockHighScores();
+        
+        // Combine real and mock scores
+        const allScores = [...realScores, ...mockScores];
+        
+        if (hasUserEntry) {
+          // Find position to insert the user's score
+          const position = getRandomHighScorePosition();
+          
+          // Create user entry
+          const userEntry: HighScore = {
+            id: 'user',
+            name: userName,
+            scenarioId,
+            score: userScore,
+            timestamp,
+            survivalTimeMs: userSurvivalTimeMs || Math.floor(Math.random() * (86400000 - 1000) + 1000) // Use provided survival time or random fallback
+          };
+          
+          // Insert user at the selected position
+          allScores.splice(position, 0, userEntry);
+        }
+        
+        // Sort scores by survival time (descending), then by score (descending), then by timestamp (most recent first)
+        const sortedScores = allScores.sort((a, b) => {
+          if (b.survivalTimeMs !== a.survivalTimeMs) return b.survivalTimeMs - a.survivalTimeMs;
+          if (b.score !== a.score) return b.score - a.score;
+          return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        });
+        
+        setHighScores(sortedScores);
+        setFilteredScores(sortedScores);
+      } catch (error) {
+        console.error('Failed to load high scores:', error);
+        // Fallback to mock data only if database fails
+        const scores = getMockHighScores();
+        
+        if (hasUserEntry) {
+          const position = getRandomHighScorePosition();
+          const userEntry: HighScore = {
+            id: 'user',
+            name: userName,
+            scenarioId,
+            score: userScore,
+            timestamp,
+            survivalTimeMs: userSurvivalTimeMs || Math.floor(Math.random() * (86400000 - 1000) + 1000)
+          };
+          scores.splice(position, 0, userEntry);
+        }
+        
+        const sortedScores = scores.sort((a, b) => {
+          if (b.survivalTimeMs !== a.survivalTimeMs) return b.survivalTimeMs - a.survivalTimeMs;
+          if (b.score !== a.score) return b.score - a.score;
+          return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        });
+        
+        setHighScores(sortedScores);
+        setFilteredScores(sortedScores);
+      }
+    };
     
-    if (hasUserEntry) {
-      // Find position to insert the user's score
-      const position = getRandomHighScorePosition();
-      
-      // Create user entry
-      const userEntry: HighScore = {
-        id: 'user',
-        name: userName,
-        scenarioId,
-        score: userScore,
-        timestamp,
-        survivalTimeMs: userSurvivalTimeMs || Math.floor(Math.random() * (86400000 - 1000) + 1000) // Use provided survival time or random fallback
-      };
-      
-      // Insert user at the selected position
-      scores.splice(position, 0, userEntry);
-    }
-    
-    // Sort scores by survival time (descending), then by score (descending), then by timestamp (most recent first)
-    const sortedScores = scores.sort((a, b) => {
-      if (b.survivalTimeMs !== a.survivalTimeMs) return b.survivalTimeMs - a.survivalTimeMs;
-      if (b.score !== a.score) return b.score - a.score;
-      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-    });
-    
-    setHighScores(sortedScores);
-    setFilteredScores(sortedScores);
+    loadHighScores();
   }, [hasUserEntry, userName, scenarioId, userScore, userSurvivalTimeMs, timestamp]);
   
   // Filter scores when filter changes
@@ -128,6 +185,12 @@ function HighScoreContent() {
   // Get score comment
   const getScoreComment = (name: string) => {
     return scoreComments[locale][name] || '';
+  };
+
+  // Check if score is from real data vs mock data
+  const isRealScore = (score: HighScore) => {
+    // Real scores have 8-character IDs, mock scores have numeric IDs, user score has 'user' ID
+    return score.id !== 'user' && score.id.length === 8 && isNaN(Number(score.id));
   };
 
   return (
@@ -187,7 +250,14 @@ function HighScoreContent() {
                       >
                         <td className="px-4 py-3 font-mono">{index + 1}</td>
                         <td className="px-4 py-3">
-                          <div className="font-bold">{score.name}</div>
+                          <div className="font-bold flex items-center gap-2">
+                            {score.name}
+                            {isRealScore(score) && (
+                              <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-mono">
+                                REAL
+                              </span>
+                            )}
+                          </div>
                           <div className="text-sm text-gray-400">
                             {isUserScore ? translations[locale].yourScore : getScoreComment(score.name)}
                           </div>
