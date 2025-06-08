@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { APOCALYPSE_SCENARIOS } from "./constants/scenarios";
-import type { Answer, ApocalypseScenario, Submission } from "./types";
-import { Locale, getTranslation, scenarioTranslations } from "./i18n";
+import { CONSOLIDATED_SCENARIOS } from "./constants/scenarios";
+import type { Answer, ConsolidatedScenario, Submission } from "./types";
+import { Locale, getTranslation } from "./i18n";
 import Header from "./components/Header";
 import { getLoadingMessage } from "./utils/messages";
 
@@ -22,7 +22,7 @@ const highScoresTranslations = {
 
 export default function Home() {
   const router = useRouter();
-  const [selectedScenario, setSelectedScenario] = useState<ApocalypseScenario | null>(null);
+  const [selectedScenario, setSelectedScenario] = useState<ConsolidatedScenario | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [result, setResult] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,9 +48,9 @@ export default function Home() {
   // Preload the background image when scenario changes
   useEffect(() => {
     if (selectedScenario) {
-      console.log('Loading background image:', selectedScenario.theme.image);
+      console.log('Loading background image:', selectedScenario.theme.backgroundImage);
       const img = new Image();
-      img.src = selectedScenario.theme.image;
+      img.src = selectedScenario.theme.backgroundImage;
       img.onload = () => {
         console.log('Background image loaded successfully');
         setImageLoaded(true);
@@ -64,12 +64,8 @@ export default function Home() {
     }
   }, [selectedScenario]);
 
-  const getTranslatedQuestion = (scenario: ApocalypseScenario, index: number) => {
-    const translation = scenarioTranslations[scenario.id]?.[locale];
-    if (!translation || !translation.questions[index]) {
-      return scenario.questions[index];
-    }
-    return translation.questions[index];
+  const getTranslatedQuestion = (scenario: ConsolidatedScenario, index: number) => {
+    return scenario.questions[index][locale] || scenario.questions[index].en;
   };
 
   const handleAnswerChange = (questionIndex: number, text: string) => {
@@ -168,7 +164,7 @@ export default function Home() {
       className={`bg-fixed min-h-screen ${selectedScenario ? `theme-${selectedScenario.id}` : ''}`} 
       style={{
         backgroundColor: '#111827', // bg-gray-900
-        backgroundImage: selectedScenario && imageLoaded ? `url(${selectedScenario.theme.image})` : 'none',
+        backgroundImage: selectedScenario && imageLoaded ? `url(${selectedScenario.theme.backgroundImage})` : 'none',
       }}
     >
       {/* Semi-transparent overlay with fixed position */}
@@ -259,7 +255,7 @@ export default function Home() {
                   </h2>
                   
                   <div className="desktop-grid">
-                    {APOCALYPSE_SCENARIOS.map((scenario) => (
+                    {CONSOLIDATED_SCENARIOS.map((scenario) => (
                       <div 
                         key={scenario.id}
                         className="border border-gray-700 bg-gray-900 bg-opacity-70 rounded-lg p-4 md:p-6 mb-4 md:mb-0 cursor-pointer transition-all hover:bg-gray-700 hover:border-gray-500"
@@ -268,10 +264,10 @@ export default function Home() {
                         <h3 className="text-xl md:text-2xl font-mono mb-2" style={{ 
                           color: `var(--${scenario.id}-secondary, var(--theme-secondary))` 
                         }}>
-                          {scenarioTranslations[scenario.id]?.[locale]?.name || scenario.name}
+                          {scenario.name[locale] || scenario.name.en}
                         </h3>
                         <p className="text-gray-300 mb-2">
-                          {scenario.name}
+                          {scenario.name.en}
                         </p>
                         <div className="text-xs text-gray-400">
                           {getTranslation(locale, 'evaluateButton')}
@@ -288,7 +284,7 @@ export default function Home() {
                   <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700">
                     <div className="flex justify-between items-center mb-6">
                       <h2 className="text-xl md:text-2xl font-mono" style={{ color: 'var(--theme-highlight)' }}>
-                        {scenarioTranslations[selectedScenario.id]?.[locale]?.name || selectedScenario.name}
+                        {selectedScenario.name[locale] || selectedScenario.name.en}
                       </h2>
                     </div>
                     
