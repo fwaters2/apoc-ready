@@ -8,21 +8,8 @@ import { Locale, getTranslation } from "./i18n";
 import Header from "./components/Header";
 import { getLoadingMessage } from "./utils/messages";
 import { injectScenarioStyles } from "./utils/styles";
-import { formatSurvivalTime } from "./utils/timeUtils";
-
-// Add translations for high scores link
-const highScoresTranslations = {
-  'en': {
-    viewHighScores: 'VIEW HALL OF FAME',
-    evaluationComplete: 'EVALUATION COMPLETE',
-    timeSurvived: 'Time Survived',
-  },
-  'zh-TW': {
-    viewHighScores: '查看名人堂',
-    evaluationComplete: '評估完成',
-    timeSurvived: '生存時間',
-  }
-};
+import ResultDisplay from "./components/ResultDisplay";
+import { parseSharedScenario } from "./utils/shareUtils";
 
 export default function Home() {
   const router = useRouter();
@@ -35,6 +22,7 @@ export default function Home() {
   const [username, setUsername] = useState<string>("Anonymous");
   const [imageLoaded, setImageLoaded] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
+  const [challengeInfo, setChallengeInfo] = useState<{ score: string; survivalTime?: string } | null>(null);
 
   // Load locale from localStorage and inject scenario styles on component mount
   useEffect(() => {
@@ -45,6 +33,22 @@ export default function Home() {
     
     // Inject dynamic scenario styles
     injectScenarioStyles();
+    
+    // Check for shared scenario in URL
+    const sharedScenario = parseSharedScenario();
+    if (sharedScenario.scenarioId) {
+      const scenario = SCENARIOS.find(s => s.id === sharedScenario.scenarioId);
+      if (scenario) {
+        setSelectedScenario(scenario);
+        // Store challenge info if available
+        if (sharedScenario.challengeScore || sharedScenario.survivalTime) {
+          setChallengeInfo({
+            score: sharedScenario.challengeScore || '',
+            survivalTime: sharedScenario.survivalTime
+          });
+        }
+      }
+    }
   }, []);
 
   // Save locale to localStorage when it changes
@@ -150,22 +154,7 @@ export default function Home() {
 
 
 
-  // Format text with special handling for ALL CAPS and exclamation marks
-  const formatText = (text: string = "") => {
-    return text.split('\n').map((paragraph, pIndex) => {
-      const processedText = paragraph
-        .replace(/\b([A-Z]{2,})\b/g, `<span style="color: var(--theme-secondary); font-weight: bold;">$1</span>`)
-        .replace(/(!{1,})/g, `<span style="color: var(--theme-secondary); font-weight: bold;">$1</span>`);
-      
-      return (
-        <p 
-          key={pIndex} 
-          className="mb-4"
-          dangerouslySetInnerHTML={{ __html: processedText }}
-        />
-      );
-    });
-  };
+
 
 
   return (
@@ -193,77 +182,13 @@ export default function Home() {
           </h1>
           
           {result ? (
-            <div key="results" className="max-w-3xl mx-auto lg:max-w-4xl">
-              <div className="bg-gray-800 bg-opacity-90 p-6 md:p-8 rounded-lg border border-gray-700 mb-8">
-                <h2 className="text-2xl md:text-3xl font-mono mb-4" style={{ color: 'var(--theme-highlight)' }}>
-                  {highScoresTranslations[locale].evaluationComplete}
-                </h2>
-                <div className="flex flex-col md:flex-row items-center mb-6">
-                  <div className="text-6xl font-bold font-mono mr-4 md:border-r border-gray-600 md:pr-4 mb-4 md:mb-0" style={{ color: 'var(--theme-primary)' }}>
-                    {result.score}%
-                  </div>
-                  <div className="text-gray-400 flex-1">
-                    <div className="text-xl mb-1">{getTranslation(locale, 'survivalRate')}</div>
-                    <div className="text-sm font-mono italic" style={{ color: 'var(--theme-secondary)' }}>&ldquo;{result.rationale}&rdquo;</div>
-                  </div>
-                  {result.survivalTimeMs && (
-                    <div className="md:border-l border-gray-600 md:pl-4 mt-4 md:mt-0">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold font-mono" style={{ color: 'var(--theme-accent)' }}>
-                          {formatSurvivalTime(result.survivalTimeMs)}
-                        </div>
-                        <div className="text-sm text-gray-400">{highScoresTranslations[locale].timeSurvived}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                {result.analysis && (
-                  <div className="border-t border-gray-700 pt-6 mb-6">
-                    <h3 className="text-xl font-mono mb-4" style={{ color: 'var(--theme-secondary)' }}>
-                      {getTranslation(locale, 'analysisTitle')}
-                    </h3>
-                    <div className="text-gray-300 leading-relaxed font-mono text-sm bg-gray-900/30 p-5 rounded border-l-4" style={{ borderLeftColor: 'var(--theme-accent)' }}>
-                      {formatText(result.analysis)}
-                    </div>
-                  </div>
-                )}
-                
-                {result.deathScene && (
-                  <div className="border-t border-gray-700 pt-6 mb-6">
-                    <h3 className="text-xl font-mono mb-4" style={{ color: 'var(--theme-secondary)' }}>
-                      {getTranslation(locale, 'deathSceneTitle')}
-                    </h3>
-                    <div className="text-gray-300 leading-relaxed font-mono text-sm italic bg-gray-900/50 p-5 rounded border-l-4" style={{ borderLeftColor: 'var(--theme-accent)' }}>
-                      {formatText(result.deathScene)}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Buttons */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <button
-                    className="py-4 text-white font-bold rounded-lg font-mono transition-colors hover:opacity-90"
-                    style={{ 
-                      backgroundColor: 'var(--theme-accent)'
-                    }}
-                    onClick={handleReset}
-                  >
-                    {getTranslation(locale, 'tryAgainButton')}
-                  </button>
-                  
-                  <button
-                    className="py-4 text-white font-bold rounded-lg font-mono transition-colors hover:opacity-90"
-                    style={{ 
-                      backgroundColor: 'var(--theme-secondary)'
-                    }}
-                    onClick={handleViewHighScores}
-                  >
-                    {highScoresTranslations[locale].viewHighScores}
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ResultDisplay
+              key="results"
+              result={result}
+              locale={locale}
+              onReset={handleReset}
+              onViewHighScores={handleViewHighScores}
+            />
           ) : (
             <div key="quiz">
               {/* Scenario Selection */}
@@ -306,6 +231,27 @@ export default function Home() {
                         {selectedScenario.name[locale] || selectedScenario.name.en}
                       </h2>
                     </div>
+                    
+                    {/* Challenge Banner */}
+                    {challengeInfo && (
+                      <div className="mb-6 p-4 bg-opacity-70 border rounded-lg" style={{ 
+                        backgroundColor: 'var(--theme-primary)', 
+                        borderColor: 'var(--theme-accent)',
+                        color: 'var(--theme-text)'
+                      }}>
+                        <div className="text-center font-mono">
+                          <div className="text-sm opacity-75 mb-1">
+                            {locale === 'en' ? '🎯 CHALLENGE MODE' : '🎯 挑戰模式'}
+                          </div>
+                          <div className="text-lg">
+                            {locale === 'en' ? 'Can you beat' : '你能超過'} <strong>{challengeInfo.score}</strong>
+                            {challengeInfo.survivalTime && (
+                              <span> {locale === 'en' ? 'and survive longer than' : '並生存超過'} <strong>{challengeInfo.survivalTime}</strong></span>
+                            )}?
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     
                     {/* Username input */}
                     <div className="mb-6">
