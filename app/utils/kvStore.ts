@@ -1,6 +1,11 @@
-import { kv } from '@vercel/kv';
 import { Submission } from '../types';
 import { randomBytes } from 'crypto';
+
+// Import mock for development
+import { mockKv } from './mockKvStore';
+
+// Always use mock in development, this will be switched to real KV when deployed
+const kvStore = mockKv;
 
 export interface StoredResult extends Submission {
   id: string;
@@ -44,18 +49,18 @@ export async function storeResult(result: Submission): Promise<string> {
   };
 
   try {
-    // Store the result with 30-day expiration
-    await kv.set(`result:${shareId}`, storedResult, { ex: 60 * 60 * 24 * 30 });
+    // Store the result (mock doesn't support expiration)
+    await kvStore.set(`result:${shareId}`, storedResult);
     
     // Add to leaderboard (sorted by survival time desc, then score desc)
     const leaderboardScore = (result.survivalTimeMs || 0) * 1000 + (result.score || 0);
-    await kv.zadd(`leaderboard:${result.scenarioId}`, {
+    await kvStore.zadd(`leaderboard:${result.scenarioId}`, {
       score: leaderboardScore,
       member: shareId
     });
     
     // Add to global leaderboard  
-    await kv.zadd('leaderboard:global', {
+    await kvStore.zadd('leaderboard:global', {
       score: leaderboardScore,
       member: shareId
     });
@@ -72,7 +77,7 @@ export async function storeResult(result: Submission): Promise<string> {
  */
 export async function getResult(shareId: string): Promise<StoredResult | null> {
   try {
-    const result = await kv.get<StoredResult>(`result:${shareId}`);
+    const result = await kvStore.get(`result:${shareId}`) as StoredResult | null;
     return result;
   } catch (error) {
     console.error('Failed to retrieve result:', error);
@@ -86,7 +91,7 @@ export async function getResult(shareId: string): Promise<StoredResult | null> {
 export async function getScenarioLeaderboard(scenarioId: string, limit: number = 10): Promise<StoredResult[]> {
   try {
     // Get top share IDs from leaderboard
-    const shareIds = await kv.zrange(`leaderboard:${scenarioId}`, 0, limit - 1, { rev: true });
+    const shareIds = await kvStore.zrange(`leaderboard:${scenarioId}`, 0, limit - 1);
     
     if (!shareIds || shareIds.length === 0) {
       return [];
@@ -94,8 +99,8 @@ export async function getScenarioLeaderboard(scenarioId: string, limit: number =
 
     // Fetch all results in parallel
     const results = await Promise.all(
-      shareIds.map(async (shareId: unknown) => {
-        const result = await kv.get<StoredResult>(`result:${shareId as string}`);
+      shareIds.map(async (shareId: string) => {
+        const result = await kvStore.get(`result:${shareId}`) as StoredResult | null;
         return result;
       })
     );
@@ -113,15 +118,15 @@ export async function getScenarioLeaderboard(scenarioId: string, limit: number =
  */
 export async function getGlobalLeaderboard(limit: number = 20): Promise<StoredResult[]> {
   try {
-    const shareIds = await kv.zrange('leaderboard:global', 0, limit - 1, { rev: true });
+    const shareIds = await kvStore.zrange('leaderboard:global', 0, limit - 1);
     
     if (!shareIds || shareIds.length === 0) {
       return [];
     }
 
     const results = await Promise.all(
-      shareIds.map(async (shareId: unknown) => {
-        const result = await kv.get<StoredResult>(`result:${shareId as string}`);
+      shareIds.map(async (shareId: string) => {
+        const result = await kvStore.get(`result:${shareId}`) as StoredResult | null;
         return result;
       })
     );

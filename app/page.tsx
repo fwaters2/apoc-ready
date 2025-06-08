@@ -10,6 +10,7 @@ import { getLoadingMessage } from "./utils/messages";
 import { injectScenarioStyles } from "./utils/styles";
 import ResultDisplay from "./components/ResultDisplay";
 import { parseSharedScenario } from "./utils/shareUtils";
+import { seedDevData } from "./utils/mockKvStore";
 
 export default function Home() {
   const router = useRouter();
@@ -33,6 +34,11 @@ export default function Home() {
     
     // Inject dynamic scenario styles
     injectScenarioStyles();
+    
+    // Seed development data if in development mode
+    if (process.env.NODE_ENV === 'development') {
+      seedDevData();
+    }
     
     // Check for shared scenario in URL
     const sharedScenario = parseSharedScenario();
