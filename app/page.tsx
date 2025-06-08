@@ -134,6 +134,18 @@ export default function Home() {
 
       const evaluation = await response.json();
       setResult(evaluation);
+      
+      // Store the result for sharing in development/production
+      try {
+        await fetch('/api/results', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(evaluation),
+        });
+      } catch (error) {
+        console.warn('Failed to store result for sharing:', error);
+        // Don't fail the main flow if storage fails
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -148,11 +160,18 @@ export default function Home() {
     setResult(null);
     setError(null);
     setImageLoaded(false);
+    setChallengeInfo(null); // Clear any challenge mode info
+    
+    // Clear URL parameters
+    if (typeof window !== 'undefined') {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   };
 
   const handleViewHighScores = () => {
     if (result) {
-      router.push(`/highscores?name=${encodeURIComponent(result.name)}&scenarioId=${encodeURIComponent(result.scenarioId)}&score=${encodeURIComponent(result.score || 0)}&timestamp=${encodeURIComponent(result.timestamp || '')}&survivalTimeMs=${encodeURIComponent(result.survivalTimeMs || 0)}`);
+      // Just pass the essential parameters - the high scores page can handle the rest
+      router.push(`/highscores?scenarioId=${encodeURIComponent(result.scenarioId)}&name=${encodeURIComponent(result.name)}`);
     } else {
       router.push('/highscores');
     }
@@ -194,6 +213,7 @@ export default function Home() {
               locale={locale}
               onReset={handleReset}
               onViewHighScores={handleViewHighScores}
+              isSharedResult={false}
             />
           ) : (
             <div key="quiz">

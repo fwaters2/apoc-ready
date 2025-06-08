@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import DevControlsWrapper from "./components/DevControlsWrapper";
-import { PostHogProvider } from "./components/PostHogProvider";
 import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
@@ -31,10 +30,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Analytics />
-        <PostHogProvider>
-          {children}
-          <DevControlsWrapper />
-        </PostHogProvider>
+        {children}
+        <DevControlsWrapper />
       </body>
     </html>
   );

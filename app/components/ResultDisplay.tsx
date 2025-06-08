@@ -12,6 +12,7 @@ interface ResultDisplayProps {
   onViewHighScores: () => void;
   showActions?: boolean;
   compact?: boolean;
+  isSharedResult?: boolean; // New prop to indicate this is a shared result
 }
 
 // Translations for the component
@@ -20,6 +21,7 @@ const resultTranslations = {
     evaluationComplete: 'EVALUATION COMPLETE',
     timeSurvived: 'Time Survived',
     tryAgain: 'tryAgainButton',
+    tryScenario: 'TRY THIS SCENARIO',
     viewHighScores: 'VIEW HALL OF FAME',
     shareChallenge: 'SHARE CHALLENGE',
     linkCopied: 'Link copied!',
@@ -29,6 +31,7 @@ const resultTranslations = {
     evaluationComplete: '評估完成',
     timeSurvived: '生存時間',
     tryAgain: 'tryAgainButton',
+    tryScenario: '嘗試此情境',
     viewHighScores: '查看名人堂',
     shareChallenge: '分享挑戰',
     linkCopied: '鏈接已複製！',
@@ -42,7 +45,8 @@ export default function ResultDisplay({
   onReset, 
   onViewHighScores, 
   showActions = true,
-  compact = false 
+  compact = false,
+  isSharedResult = false
 }: ResultDisplayProps) {
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
 
@@ -167,7 +171,10 @@ export default function ResultDisplay({
               }}
               onClick={onReset}
             >
-              {getTranslation(locale, 'tryAgainButton')}
+              {isSharedResult 
+                ? resultTranslations[locale].tryScenario 
+                : getTranslation(locale, 'tryAgainButton')
+              }
             </button>
             
             <button

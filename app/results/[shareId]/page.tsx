@@ -87,7 +87,12 @@ export default function ResultPage({ params }: ResultPageProps) {
   }, [selectedScenario]);
 
   const handleReset = () => {
-    router.push('/');
+    // Pre-select the same scenario for the visitor
+    if (result) {
+      router.push(`/?scenario=${result.scenarioId}&challenge=${result.score}%`);
+    } else {
+      router.push('/');
+    }
   };
 
   const handleViewHighScores = () => {
@@ -184,6 +189,9 @@ export default function ResultPage({ params }: ResultPageProps) {
             locale={locale}
             onReset={handleReset}
             onViewHighScores={handleViewHighScores}
+            showActions={true}
+            compact={false}
+            isSharedResult={true}
           />
         </div>
       </main>
