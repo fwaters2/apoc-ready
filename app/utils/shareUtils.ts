@@ -6,6 +6,14 @@ export interface ShareableResult {
 }
 
 /**
+ * Generate a shareable URL for a stored result
+ */
+export function generateResultShareUrl(shareId: string): string {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  return `${baseUrl}/results/${shareId}`;
+}
+
+/**
  * Generate a shareable URL that pre-selects a scenario for others to try
  */
 export function generateScenarioShareUrl(result: ShareableResult): string {

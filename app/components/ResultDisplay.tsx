@@ -1,7 +1,7 @@
 import { Submission } from "../types";
 import { Locale, getTranslation } from "../i18n";
 import { formatSurvivalTime } from "../utils/timeUtils";
-import { generateScenarioShareUrl, generateShareText, copyToClipboard, ShareableResult } from "../utils/shareUtils";
+import { generateShareText, generateResultShareUrl, copyToClipboard, ShareableResult } from "../utils/shareUtils";
 import { useState } from "react";
 import { SCENARIOS } from "../constants/scenarios";
 
@@ -47,23 +47,43 @@ export default function ResultDisplay({
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   const handleShare = async () => {
-    // Find the scenario name
-    const scenario = SCENARIOS.find(s => s.id === result.scenarioId);
-    const scenarioName = scenario?.name[locale] || scenario?.name.en || 'Unknown Scenario';
-    
-    const shareableResult: ShareableResult = {
-      scenarioId: result.scenarioId,
-      scenarioName,
-      userScore: result.score || 0,
-      survivalTime: result.survivalTimeMs,
-    };
+    try {
+      // First, store the result to get a share ID
+      const response = await fetch('/api/results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(result),
+      });
 
-    const shareUrl = generateScenarioShareUrl(shareableResult);
-    const shareText = generateShareText(shareableResult, locale);
-    const fullShareText = `${shareText}\n\n${shareUrl}`;
+      if (!response.ok) {
+        throw new Error('Failed to store result');
+      }
 
-    const success = await copyToClipboard(fullShareText);
-    setShareStatus(success ? 'copied' : 'failed');
+      const { shareId } = await response.json();
+      
+      // Generate the persistent share URL
+      const shareUrl = generateResultShareUrl(shareId);
+      
+      // Find the scenario name for the share text
+      const scenario = SCENARIOS.find(s => s.id === result.scenarioId);
+      const scenarioName = scenario?.name[locale] || scenario?.name.en || 'Unknown Scenario';
+      
+      const shareableResult: ShareableResult = {
+        scenarioId: result.scenarioId,
+        scenarioName,
+        userScore: result.score || 0,
+        survivalTime: result.survivalTimeMs,
+      };
+
+      const shareText = generateShareText(shareableResult, locale);
+      const fullShareText = `${shareText}\n\n${shareUrl}`;
+
+      const success = await copyToClipboard(fullShareText);
+      setShareStatus(success ? 'copied' : 'failed');
+    } catch (error) {
+      console.error('Share failed:', error);
+      setShareStatus('failed');
+    }
     
     // Reset status after 2 seconds
     setTimeout(() => setShareStatus('idle'), 2000);
