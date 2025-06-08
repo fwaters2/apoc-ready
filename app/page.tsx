@@ -7,6 +7,7 @@ import type { Answer, ConsolidatedScenario, Submission } from "./types";
 import { Locale, getTranslation } from "./i18n";
 import Header from "./components/Header";
 import { getLoadingMessage } from "./utils/messages";
+import { injectScenarioStyles } from "./utils/styles";
 
 // Add translations for high scores link
 const highScoresTranslations = {
@@ -32,12 +33,15 @@ export default function Home() {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
 
-  // Load locale from localStorage on component mount
+  // Load locale from localStorage and inject scenario styles on component mount
   useEffect(() => {
     const savedLocale = localStorage.getItem('apoc-locale');
     if (savedLocale && (savedLocale === 'en' || savedLocale === 'zh-TW')) {
       setLocale(savedLocale as Locale);
     }
+    
+    // Inject dynamic scenario styles
+    injectScenarioStyles();
   }, []);
 
   // Save locale to localStorage when it changes

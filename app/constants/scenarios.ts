@@ -130,10 +130,10 @@ export const CONSOLIDATED_SCENARIOS: ConsolidatedScenario[] = [
       backgroundImage: "/backgrounds/ai-takeover.png",
       colors: {
         primary: "#1A1A2E",
-        secondary: "#E94560",
+        secondary: "#4A90E2",
         accent: "#16213E",
         text: "#F4F4F4",
-        highlight: "#0F3460"
+        highlight: "#2563EB"
       }
     }
   },

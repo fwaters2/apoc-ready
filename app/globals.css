@@ -8,31 +8,6 @@
   --container-max-width: 1200px;
   --header-height: 3.5rem;
   
-  /* Theme specific variables */
-  --zombie-primary: #aa2222;
-  --zombie-secondary: #ff4444;
-  --zombie-accent: #990000;
-  --zombie-text: #ffcccc;
-  --zombie-highlight: #dd3333;
-  
-  --alien-primary: #22aa44;
-  --alien-secondary: #44ff66;
-  --alien-accent: #009922;
-  --alien-text: #ccffdd;
-  --alien-highlight: #33dd55;
-  
-  --ai-takeover-primary: #1A1A2E;
-  --ai-takeover-secondary: #E94560;
-  --ai-takeover-accent: #16213E;
-  --ai-takeover-text: #F4F4F4;
-  --ai-takeover-highlight: #0F3460;
-  
-  --asteroid-impact-primary: #8B4513;
-  --asteroid-impact-secondary: #F4A460;
-  --asteroid-impact-accent: #CD853F;
-  --asteroid-impact-text: #FFF8DC;
-  --asteroid-impact-highlight: #D2691E;
-  
   /* Default theme (can be either zombie or alien) */
   --theme-primary: var(--zombie-primary);
   --theme-secondary: var(--zombie-secondary);
@@ -90,39 +65,6 @@ body {
   position: relative;
   z-index: 1;
   min-height: 100vh;
-}
-
-/* Theme classes */
-.theme-zombie {
-  --theme-primary: var(--zombie-primary);
-  --theme-secondary: var(--zombie-secondary);
-  --theme-accent: var(--zombie-accent);
-  --theme-text: var(--zombie-text);
-  --theme-highlight: var(--zombie-highlight);
-}
-
-.theme-alien {
-  --theme-primary: var(--alien-primary);
-  --theme-secondary: var(--alien-secondary);
-  --theme-accent: var(--alien-accent);
-  --theme-text: var(--alien-text);
-  --theme-highlight: var(--alien-highlight);
-}
-
-.theme-ai-takeover {
-  --theme-primary: var(--ai-takeover-primary);
-  --theme-secondary: var(--ai-takeover-secondary);
-  --theme-accent: var(--ai-takeover-accent);
-  --theme-text: var(--ai-takeover-text);
-  --theme-highlight: var(--ai-takeover-highlight);
-}
-
-.theme-asteroid-impact {
-  --theme-primary: var(--asteroid-impact-primary);
-  --theme-secondary: var(--asteroid-impact-secondary);
-  --theme-accent: var(--asteroid-impact-accent);
-  --theme-text: var(--asteroid-impact-text);
-  --theme-highlight: var(--asteroid-impact-highlight);
 }
 
 /* Desktop breakpoints */
