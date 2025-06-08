@@ -6,7 +6,7 @@ import { APOCALYPSE_SCENARIOS } from "./constants/scenarios";
 import type { Answer, ApocalypseScenario, Submission } from "./types";
 import { Locale, getTranslation, scenarioTranslations } from "./i18n";
 import Header from "./components/Header";
-import { getLoadingMessage } from "./utils/openai";
+import { getLoadingMessage } from "./utils/messages";
 
 // Add translations for high scores link
 const highScoresTranslations = {

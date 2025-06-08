@@ -1,4 +1,4 @@
-import type { EvaluationResponse } from "./openai";
+import type { EvaluationResponse } from "./messages";
 import { Locale } from "../i18n";
 
 type MockResponses = Record<string, Record<Locale, EvaluationResponse>>;
