@@ -25,6 +25,24 @@ export interface ScenarioConfig {
   promptTemplate: string;
 }
 
+// Base prompt template function to eliminate duplication
+function createPromptTemplate(scenarioName: string): string {
+  return `Given the following ${scenarioName.toLowerCase()} scenario and user answers, evaluate their likelihood of survival. Channel comedian Bill Burr's style throughout ALL sections - use his direct, cynical, exasperated rants about the absurdity of people's choices, with ALL CAPS for emphasis and lots of rhetorical questions.
+Scenario: ${scenarioName}
+Answers:
+{{answers}}
+
+Provide a structured evaluation with ALL sections in Bill Burr's comedic voice:
+
+1. ANALYSIS: Express exasperated disbelief at their choices, use rhetorical questions, and build up a rant about how each choice is worse than the last. Use Bill Burr's signature phrases and comedic timing.
+
+2. DEATH_SCENE: Write this EXACTLY like Bill Burr would describe it in a stand-up routine - with his characteristic rants, interrupting himself, using ALL CAPS for emphasis, and expressing complete disbelief at the user's stupidity. Make it a comedic, absurd scene showing the inevitable consequences of their terrible choices.
+
+3. SCORE_AND_RATIONALE: Write a one-sentence rationale in pure Bill Burr style - cynical, blunt, with his signature exasperated tone. Make it sound like something he would yell during a podcast rant.
+
+Respond with properly formatted JSON containing these sections.`;
+}
+
 // Unified scenario configurations - single source of truth
 export const scenarioConfigs: Record<string, ScenarioConfig> = {
   'zombie': {
@@ -65,20 +83,7 @@ export const scenarioConfigs: Record<string, ScenarioConfig> = {
         'zh-TW': "如果遇到被感染的親人，你會如何處理？"
       }
     ],
-    promptTemplate: `Given the following zombie apocalypse scenario and user answers, evaluate their likelihood of survival. Channel comedian Bill Burr's style throughout ALL sections - use his direct, cynical, exasperated rants about the absurdity of people's choices, with ALL CAPS for emphasis and lots of rhetorical questions.
-Scenario: Zombie Outbreak
-Answers:
-{{answers}}
-
-Provide a structured evaluation with ALL sections in Bill Burr's comedic voice:
-
-1. ANALYSIS: Express exasperated disbelief at their choices, use rhetorical questions, and build up a rant about how each choice is worse than the last. Use Bill Burr's signature phrases and comedic timing.
-
-2. DEATH_SCENE: Write this EXACTLY like Bill Burr would describe it in a stand-up routine - with his characteristic rants, interrupting himself, using ALL CAPS for emphasis, and expressing complete disbelief at the user's stupidity. Make it a comedic, absurd scene showing the inevitable consequences of their terrible choices.
-
-3. SCORE_AND_RATIONALE: Write a one-sentence rationale in pure Bill Burr style - cynical, blunt, with his signature exasperated tone. Make it sound like something he would yell during a podcast rant.
-
-Respond with properly formatted JSON containing these sections.`
+    promptTemplate: createPromptTemplate('Zombie Outbreak')
   },
 
   'alien': {
@@ -119,20 +124,7 @@ Respond with properly formatted JSON containing these sections.`
         'zh-TW': "如果談判失敗，你的備用計劃是什麼？"
       }
     ],
-    promptTemplate: `Given the following alien invasion scenario and user answers, evaluate their likelihood of survival. Channel comedian Bill Burr's style throughout ALL sections - use his direct, cynical, exasperated rants about the absurdity of people's choices, with ALL CAPS for emphasis and lots of rhetorical questions.
-Scenario: Alien Invasion
-Answers:
-{{answers}}
-
-Provide a structured evaluation with ALL sections in Bill Burr's comedic voice:
-
-1. ANALYSIS: Express exasperated disbelief at their choices, use rhetorical questions, and build up a rant about how each choice is worse than the last. Use Bill Burr's signature phrases and comedic timing.
-
-2. DEATH_SCENE: Write this EXACTLY like Bill Burr would describe it in a stand-up routine - with his characteristic rants, interrupting himself, using ALL CAPS for emphasis, and expressing complete disbelief at the user's stupidity. Make it a comedic, absurd scene showing the inevitable consequences of their terrible choices.
-
-3. SCORE_AND_RATIONALE: Write a one-sentence rationale in pure Bill Burr style - cynical, blunt, with his signature exasperated tone. Make it sound like something he would yell during a podcast rant.
-
-Respond with properly formatted JSON containing these sections.`
+    promptTemplate: createPromptTemplate('Alien Invasion')
   },
 
   'ai-takeover': {
@@ -173,20 +165,7 @@ Respond with properly formatted JSON containing these sections.`
         'zh-TW': "你會如何組織人類對抗機器的抵抗？"
       }
     ],
-    promptTemplate: `Given the following AI takeover scenario and user answers, evaluate their likelihood of survival. Channel comedian Bill Burr's style throughout ALL sections - use his direct, cynical, exasperated rants about the absurdity of people's choices, with ALL CAPS for emphasis and lots of rhetorical questions.
-Scenario: AI Takeover
-Answers:
-{{answers}}
-
-Provide a structured evaluation with ALL sections in Bill Burr's comedic voice:
-
-1. ANALYSIS: Express exasperated disbelief at their choices, use rhetorical questions, and build up a rant about how each choice is worse than the last. Use Bill Burr's signature phrases and comedic timing.
-
-2. DEATH_SCENE: Write this EXACTLY like Bill Burr would describe it in a stand-up routine - with his characteristic rants, interrupting himself, using ALL CAPS for emphasis, and expressing complete disbelief at the user's stupidity. Make it a comedic, absurd scene showing the inevitable consequences of their terrible choices.
-
-3. SCORE_AND_RATIONALE: Write a one-sentence rationale in pure Bill Burr style - cynical, blunt, with his signature exasperated tone. Make it sound like something he would yell during a podcast rant.
-
-Respond with properly formatted JSON containing these sections.`
+    promptTemplate: createPromptTemplate('AI Takeover')
   },
 
   'asteroid-impact': {
@@ -227,20 +206,7 @@ Respond with properly formatted JSON containing these sections.`
         'zh-TW': "在無盡的冬天中你會如何保暖？"
       }
     ],
-    promptTemplate: `Given the following asteroid impact scenario and user answers, evaluate their likelihood of survival. Channel comedian Bill Burr's style throughout ALL sections - use his direct, cynical, exasperated rants about the absurdity of people's choices, with ALL CAPS for emphasis and lots of rhetorical questions.
-Scenario: Asteroid Impact
-Answers:
-{{answers}}
-
-Provide a structured evaluation with ALL sections in Bill Burr's comedic voice:
-
-1. ANALYSIS: Express exasperated disbelief at their choices, use rhetorical questions, and build up a rant about how each choice is worse than the last. Use Bill Burr's signature phrases and comedic timing.
-
-2. DEATH_SCENE: Write this EXACTLY like Bill Burr would describe it in a stand-up routine - with his characteristic rants, interrupting himself, using ALL CAPS for emphasis, and expressing complete disbelief at the user's stupidity. Make it a comedic, absurd scene showing the inevitable consequences of their terrible choices.
-
-3. SCORE_AND_RATIONALE: Write a one-sentence rationale in pure Bill Burr style - cynical, blunt, with his signature exasperated tone. Make it sound like something he would yell during a podcast rant.
-
-Respond with properly formatted JSON containing these sections.`
+    promptTemplate: createPromptTemplate('Asteroid Impact')
   }
 };
 
